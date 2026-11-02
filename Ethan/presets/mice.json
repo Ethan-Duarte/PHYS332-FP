@@ -1,0 +1,11 @@
+{
+  "name": "Mice-style disk-bulge-halo (Barnes 2004)",
+  "seed": 42,
+  "units": {"G": 1, "length": "Barnes code length", "mass": "Barnes code mass"},
+  "disk": {"mass": 0.1875, "scale": 0.08333333333333333, "height": 0.005, "cutoff": 0.4},
+  "bulge": {"mass": 0.0625, "scale": 0.04168, "cutoff": 1.5},
+  "halo": {"mass": 1.0, "scale": 0.1, "gamma": 0, "cutoff": 6.0},
+  "particles": {"disk": 80, "bulge": 20, "halo": 160},
+  "encounter": {"separation": 1.0, "pericenter": 0.25, "orientations": [[25, -30], [40, 60]]},
+  "notes": "Spatial profiles from Barnes 2004; preview velocities are only approximate. Cutoffs and particle counts are development choices. No observational calibration or AGAMA validation yet."
+}

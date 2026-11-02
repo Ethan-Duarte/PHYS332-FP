@@ -1,0 +1,17 @@
+# Architecture and decision register, Version 1
+
+| Decision | Reason | Status |
+|---|---|---|
+| Work from fresh source layout, reuse recovered gravity algorithms | Minimize coupling to old demos | Implemented |
+| Use arrays `(x,v,m)` and persistent `(component,galaxy)` labels | Any force solver or analyzer can consume one structure | Implemented |
+| Force function `(x,m) -> accelerations` | Leapfrog doesn't know tree internals | Implemented |
+| Separate profile math, sampling, encounter geometry | Extensibility and mathematical validation | Implemented |
+| Native exact Plummer DF as first equilibrium test | Truly consistent spherical phase space, simple probability distributions | Implemented, basic tests |
+| Native Mice preview deliberately approximate | Allow full end-to-end demo without claiming realistic stellar equilibrium | Implemented, **not validated** |
+| Optional AGAMA for disk-bulge-halo equilibrium | Distribution-function-based self-consistent modeling | Written, not runtime tested |
+| `G=1`, explicit Barnes-style preset | Consistent with earlier solver and paper | Implemented |
+| Seeded native sampling, exact snapshots saved | Reproducibility | Implemented |
+| No front end or general plugin architecture yet | Avoid premature complexity | Deferred |
+| Target system: the Mice (NGC 4676) | Published model and observational tidal tails | Selected |
+
+Source links: Barnes (2004) https://doi.org/10.1111/j.1365-2966.2004.07725.x ; AGAMA https://github.com/GalacticDynamics-Oxford/Agama ; Vasiliev (2019) https://doi.org/10.1093/mnras/sty2672 ; Dehnen (1993) https://doi.org/10.1093/mnras/265.1.250.
