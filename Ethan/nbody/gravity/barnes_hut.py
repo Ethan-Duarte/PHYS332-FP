@@ -43,7 +43,11 @@ def from_node(i, node, x, m, eps, theta, G):
                start=np.zeros(3))
 
 
-def acceleration(x, m, eps=0.01, theta=0.5, G=1.0):
+def acceleration(x, m, eps=0.01, theta=0.5, G=1.0, cancel=None):
     root = build_tree(x, m)
-    return np.array([from_node(i, root, x, m, eps, theta, G)
-                     for i in range(len(m))])
+    acc = []
+    for i in range(len(m)):
+        if cancel is not None and cancel.is_set():
+            raise InterruptedError('Simulation cancelled')
+        acc.append(from_node(i, root, x, m, eps, theta, G))
+    return np.array(acc)

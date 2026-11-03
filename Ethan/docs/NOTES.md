@@ -22,3 +22,7 @@ Source links: Barnes (2004) https://doi.org/10.1111/j.1365-2966.2004.07725.x ; A
 - `experiments/mice_animation.py` evolves high-count particles and saves a trajectory for repeatable playback. Dark matter remains live, but is hidden by default in the visual display to emphasize stellar tidal features.
 - Add an **optional** Numba-accelerated direct-summation implementation to obtain high-resolution teaching animations without changing the original algorithms. The force law is identical to `gravity/direct.py`; benchmarks must still compare the named implementations honestly.
 - An attractive animation is **not** a validation test. Native disk kinematics remain approximate, as described in `README.md` and `docs/VALIDATION.md`.
+
+### V1.3 update, 2026-11-03
+
+GUI enhancements completed: cancel event, compiled Barnes–Hut force traversal (compared with original), interactive 3D Plotly viewer with self-contained HTML export, arbitrary initial relative position/velocity vectors, offline trajectory replay, and per-snapshot force-comparison tab. AGAMA equilibrium initial conditions are **not** validated or enabled. A working animated collision is not yet evidence of an astrophysically validated Mice reconstruction. Full-resolution convergence and observational reconstruction remain the next core milestones.

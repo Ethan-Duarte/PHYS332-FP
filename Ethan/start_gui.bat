@@ -28,12 +28,12 @@ if not exist "%PYTHON%" goto :python_error
 :check_deps
 echo Using:
 "%PYTHON%" --version
-"%PYTHON%" -c "import gradio, numba, numpy, matplotlib, PIL" >nul 2>nul
+"%PYTHON%" -c "import gradio, numba, numpy, matplotlib, PIL, plotly" >nul 2>nul
 if not errorlevel 1 goto :start_server
 
 echo.
 echo Installing missing dependencies. This may take a while on first launch.
-"%PYTHON%" -m pip install -r requirements.txt -r requirements-fast.txt -r requirements-gui.txt
+"%PYTHON%" -m pip install -r requirements.txt -r requirements-fast.txt -r requirements-gui.txt -r requirements-viewer.txt
 if errorlevel 1 goto :install_error
 
 :start_server

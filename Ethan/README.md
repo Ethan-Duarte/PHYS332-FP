@@ -1,16 +1,32 @@
-# N-Baddies: N-body Galaxy Simulator — Version 1
+# N-Baddies: N-body Galaxy Simulator — V1.3
 
 A small, fresh Python project. The direct force calculation, leapfrog, and octree descend from our earlier student implementations, but the file layout is new.
 
-## Browser interface (V1.2) — no manual terminal commands on Windows
+## Browser interface (V1.3) — interactive 3D + cancellation
 
-**Double-click `start_gui.bat`** in the extracted project folder. It sets up a local Python environment on first launch (Python 3.11/3.12 and Internet required) and opens the Gradio interface in your browser. Keep the launcher window open while using it.
+**Extract the entire zip** to a normal folder and double-click `start_gui.bat`.
+The corrected launcher creates `.venv` if needed, installs missing dependencies, and
+starts the local Gradio server. **The window stays open and shows errors** if startup fails.
 
-**Run an encounter** lets you select galaxy parameters, particle counts, solver, integration settings, and animation options. **Replay a saved run** lets you change the camera and FPS without rerunning gravity. Results are saved under `results/runs/`.
+If the browser doesn't open, manually visit **http://127.0.0.1:7860** while the
+launcher is still running. If Python fails during startup, its full traceback is
+written to `startup_error.log` in the project folder. Use that file to diagnose
+what's missing. Avoid launching `app.py` by double-clicking it.
 
-For manual setup: `pip install -r requirements.txt -r requirements-fast.txt -r requirements-gui.txt` and `python app.py`.
+If you installed dependencies earlier, keep the existing `.venv` folder when
+replacing the project; they shouldn't need to be installed again. If dependency
+errors persist, delete `.venv` once and rerun the launcher with Python 3.11 or 3.12.
 
-See [`docs/GUI_GUIDE.md`](docs/GUI_GUIDE.md) for a detailed walkthrough. This is a local UI only; it does not make the physical model scientifically validated.
+**Run an encounter** supports the Mice-inspired parabolic setup or custom relative position/velocity vectors; the main result is a draggable, time-animated 3D viewer. **Replay a saved run** changes camera bounds and particle visibility without rerunning gravity. Results are saved under `results/runs/`.
+
+For manual startup in a Windows Command Prompt opened in this folder:
+
+```bat
+.venv\Scripts\python.exe -u launch_gui.py
+```
+
+See `docs/GUI_V13.md` for the current interface and `docs/GUI_GUIDE.md` for the earlier interface. The interface runs only on
+localhost. It does not make the physical model scientifically validated.
 
 ## Status (important)
 
@@ -123,3 +139,18 @@ python -m experiments.mice_animation --load results/mice_animation_trajectory.np
 Useful options: `--disk`, `--bulge`, `--halo`, `--seed`, `--steps`, `--dt`, `--save-every`, `--fps`, `--view xy|xz|both`, `--lim`, `--format gif|mp4|both`, `--show-halo`, `--solver fast|direct|tree`, `--name my_run`. Use a unique `--name` for parameter comparisons so files are not overwritten.
 
 **Scientific limitation:** More particles help visualize fine structure but don't fix the approximate velocity distributions in `native.mice_preview`. The animations remain illustrative until the disk–bulge–halo equilibrium model, timestep/softening convergence, and encounter configuration are verified and validated. A bigger N is not equivalent to a converged scientific result. See `docs/VALIDATION.md`.
+
+---
+
+## V1.3 — GUI, live cancellation, interactive 3D, custom encounter vectors
+
+Run `start_gui.bat` on Windows or `python -m pip install -r requirements.txt -r requirements-fast.txt -r requirements-gui.txt -r requirements-viewer.txt` followed by `python app.py`.
+
+- The main viewer is an **interactive WebGL 3D plot**: drag to rotate, scroll to zoom, play/pause or select a saved time. A self-contained HTML copy can be downloaded.
+- **Cancel run** requests termination at the next timestep/force-check boundary. Partial completed snapshots are retained.
+- **Mice-inspired** and **Custom relative vectors** modes select nominal parabolic initial conditions or arbitrary relative position/velocity vectors.
+- **Barnes–Hut (Numba)** accelerates the existing octree's traversal, retaining the original Python implementation as a test reference. A Python Barnes–Hut option is not offered for long GUI runs.
+- **Compare gravitational solvers** benchmarks acceleration error and speed against accelerated direct summation on one shared particle distribution.
+- The GUI hides the untested AGAMA backend until its API and isolated equilibrium are validated.
+
+See `docs/GUI_V13.md` for parameters, limitations, and the scientific roadmap. The simulator remains an **exploratory preview** of a disk-galaxy encounter, not a validated Mice reconstruction.

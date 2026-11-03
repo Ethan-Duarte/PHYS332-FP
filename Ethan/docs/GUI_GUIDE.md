@@ -4,7 +4,7 @@
 
 1. Extract the entire zip archive to a writable folder.
 2. Double-click **start_gui.bat** in the extracted folder. The first launch creates a `.venv` Python environment and downloads dependencies. Use Python **3.11 or 3.12** on Windows. You need an Internet connection for that first setup.
-3. Your browser opens the local interface. It runs on your own computer at `http://127.0.0.1:7860` (or a nearby available port).
+3. The launcher will print the local URL and try to open your browser. If it does not open, go to http://127.0.0.1:7860 yourself while the window is running. If startup fails, check startup_error.log. Your browser opens the local interface. It runs on your own computer at `http://127.0.0.1:7860` (or a nearby available port).
 4. Keep the small launcher console open while using the GUI; closing it stops the local server.
 
 The GUI does not upload your galaxy particles to a cloud service. The Gradio server binds to localhost (`127.0.0.1`) and `share=False`.
