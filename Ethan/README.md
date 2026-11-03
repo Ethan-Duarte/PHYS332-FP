@@ -154,3 +154,22 @@ Run `start_gui.bat` on Windows or `python -m pip install -r requirements.txt -r 
 - The GUI hides the untested AGAMA backend until its API and isolated equilibrium are validated.
 
 See `docs/GUI_V13.md` for parameters, limitations, and the scientific roadmap. The simulator remains an **exploratory preview** of a disk-galaxy encounter, not a validated Mice reconstruction.
+
+
+## V1.3.1 — 3D playback fix (2026-11-03)
+
+The embedded Gradio Plotly control did not reliably apply animation frames, even though
+the saved trajectories contained changing particle positions. The GUI now embeds an
+independent offline HTML viewer with its own **Play / Pause**, step buttons,
+**time slider**, and interactive 3D camera. These controls directly update Plotly's
+particle coordinates, rather than depending on Gradio's Plotly frame renderer.
+
+Use **Replay a saved run** to open existing `.npz` trajectories; no new simulation
+is necessary. Every replay also saves `viewer_3d.html`, which can be opened
+independently in your browser.
+
+The embedded preview may limit playback to 180 evenly spaced snapshots for browser
+responsiveness. All simulation snapshots are still preserved in the `.npz` file.
+
+If the embedded viewer does not appear, download the **Standalone interactive 3D viewer**
+file in the GUI and open the HTML directly in your browser.

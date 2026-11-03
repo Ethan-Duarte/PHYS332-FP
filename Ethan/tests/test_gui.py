@@ -16,13 +16,13 @@ def test_run_and_replay(tmp_path, monkeypatch):
     monkeypatch.setattr(app,'RESULTS',tmp_path)
     monkeypatch.setattr(app,'RUNS',tmp_path/'runs')
     final = list(app.simulate(*params(),progress=lambda *a,**k:None))[-1]
-    assert len(final[0].frames)==5
+    assert "<iframe" in final[0] and "viewer_3d.html" in final[0]
     assert Path(final[4]).exists() and Path(final[5]).exists() and Path(final[6]).exists()
     assert final[2] is None and final[3] is None
     assert 'Simulation complete' in final[7]
     selected = str(Path(final[4]).relative_to(tmp_path))
     replay = app.replay_saved(selected,1.5,False,1000,15,'None',progress=lambda *a,**k:None)
-    assert len(replay[0].frames)==5 and Path(replay[4]).exists()
+    assert "<iframe" in replay[0] and Path(replay[4]).exists()
 
 
 def test_custom_vectors_preserve_relative_state():

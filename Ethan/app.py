@@ -17,7 +17,7 @@ from nbody.encounters import parabolic_pair, relative_pair
 from nbody.galaxies.generate import galaxy
 from nbody.integrate import evolve
 from nbody.io import load_trajectory, save_trajectory
-from nbody.viewer import figure3d
+from nbody.viewer import write_viewer, viewer_iframe
 from nbody.benchmarks import compare
 
 ROOT = Path(__file__).resolve().parent
@@ -66,9 +66,9 @@ def separation_plot(times, positions, component, origins):
 
 def visualizations(trajectory, folder, lim, show_halo, max_points, fps, export):
     t, x, v, m, comp, ids, meta = load_trajectory(trajectory)
-    fig = figure3d(t, x, comp, ids, limit=lim, show_halo=show_halo, max_points=int(max_points))
-    html = folder / 'viewer_3d.html'
-    fig.write_html(html, include_plotlyjs=True)
+    html = write_viewer(folder / 'viewer_3d.html', t, x, comp, ids,
+                        limit=lim, show_halo=show_halo, max_points=int(max_points))
+    viewer = viewer_iframe(html)
     curve, summary = separation_plot(t, x, comp, ids)
     gif = mp4 = None
     # Optional 2D video for portable sharing. Interactive 3D is the primary viewer.
@@ -78,7 +78,7 @@ def visualizations(trajectory, folder, lim, show_halo, max_points, fps, export):
     if export in ('MP4', 'Both'):
         mp4 = folder / 'animation.mp4'
         render(t, x, comp, ids, mp4, fps=int(fps), lim=lim, view='xy', show_halo=show_halo)
-    return fig, curve, str(gif) if gif else None, str(mp4) if mp4 else None, str(html), summary
+    return viewer, curve, str(gif) if gif else None, str(mp4) if mp4 else None, str(html), summary
 
 
 FIELD_NAMES, FIELD_CONTROLS = [], []
@@ -269,7 +269,7 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
                     stop_button = gr.Button('Cancel run', variant='stop', scale=1)
             with gr.Column(scale=2, min_width=530):
                 status = gr.Markdown('Configure a run, then click **Run simulation**. You can rotate and zoom the 3D viewer with your mouse.')
-                viewer = gr.Plot(label='Interactive 3D viewer · drag to rotate; play/slider to animate')
+                viewer = gr.HTML(label='Interactive 3D viewer · drag to rotate; use the controls below')
                 curve = gr.Plot(label='Bulge-core separation')
                 with gr.Row():
                     gif_file = gr.File(label='Optional GIF')
@@ -292,7 +292,7 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
             replay_export = gr.Radio(['None','GIF','MP4','Both'],value='None',label='Optional 2D video')
             replay_button = gr.Button('Open trajectory in 3D',variant='primary')
         replay_summary = gr.Markdown()
-        replay_view = gr.Plot(label='Interactive 3D trajectory')
+        replay_view = gr.HTML(label='Interactive 3D trajectory')
         replay_curve = gr.Plot(label='Core separation')
         with gr.Row():
             replay_html = gr.File(label='Download interactive 3D HTML')
@@ -311,7 +311,7 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
         gr.Markdown('''
 ### Basic use
 1. Start with **Mice-inspired parabolic** and **Fast direct (Numba)**, then try **Barnes–Hut (Numba)**.
-2. Click **Run simulation**, then drag the 3D plot to orbit the camera. Use its ▶ Play control or the time slider.
+2. Click **Run simulation**, then drag the 3D plot to orbit the camera. Use the Play/Pause button and timeline beneath it.
 3. To stop a long run, click **Cancel run**. Cancellation is checked between integration steps (and after each compiled force evaluation). A partial trajectory will be saved when available.
 4. Use **Replay a saved run** to regenerate the interactive view, without re-integrating.
 5. Use **Custom relative vectors** to specify the initial position and velocity of galaxy B relative to galaxy A. Both galaxies are centered around the barycenter.

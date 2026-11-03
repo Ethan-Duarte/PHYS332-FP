@@ -31,3 +31,22 @@ def test_benchmark_has_direct_reference():
     assert rows[0][0]=='Fast direct (Numba)'
     assert rows[0][2]==0
     assert 'Barnes' in rows[1][0]
+
+
+def test_standalone_viewer_contains_distinct_positions_and_controls(tmp_path):
+    import json
+    import re
+    from nbody.viewer import write_viewer, viewer_iframe
+    times = np.arange(3, dtype=float)
+    positions = np.zeros((3, 4, 3))
+    positions[:, 0, 0] = [0, 2, 5]
+    positions[:, 2, 2] = [0, -1, -3]
+    components = np.array([0, 0, 1, 1])
+    origins = np.array([0, 0, 1, 1])
+    path = write_viewer(tmp_path / 'viewer_3d.html', times, positions, components, origins)
+    html = path.read_text()
+    assert 'Plotly.restyle' in html and 'id="timeline"' in html and 'id="play"' in html
+    payload = json.loads(re.search(r'const payload=(\{.*?\});\s*const frames=', html, re.S).group(1))
+    assert len(payload['frames']) == 3
+    assert payload['frames'][0] != payload['frames'][-1]
+    assert '<iframe' in viewer_iframe(path)
