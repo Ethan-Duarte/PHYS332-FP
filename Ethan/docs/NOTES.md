@@ -15,3 +15,10 @@
 | Target system: the Mice (NGC 4676) | Published model and observational tidal tails | Selected |
 
 Source links: Barnes (2004) https://doi.org/10.1111/j.1365-2966.2004.07725.x ; AGAMA https://github.com/GalacticDynamics-Oxford/Agama ; Vasiliev (2019) https://doi.org/10.1093/mnras/sty2672 ; Dehnen (1993) https://doi.org/10.1093/mnras/265.1.250.
+
+## V1.1 animation / resolution decision
+
+- Keep the original small `mice_preview.py` as a quick smoke test.
+- `experiments/mice_animation.py` evolves high-count particles and saves a trajectory for repeatable playback. Dark matter remains live, but is hidden by default in the visual display to emphasize stellar tidal features.
+- Add an **optional** Numba-accelerated direct-summation implementation to obtain high-resolution teaching animations without changing the original algorithms. The force law is identical to `gravity/direct.py`; benchmarks must still compare the named implementations honestly.
+- An attractive animation is **not** a validation test. Native disk kinematics remain approximate, as described in `README.md` and `docs/VALIDATION.md`.

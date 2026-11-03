@@ -2,6 +2,16 @@
 
 A small, fresh Python project. The direct force calculation, leapfrog, and octree descend from our earlier student implementations, but the file layout is new.
 
+## Browser interface (V1.2) — no manual terminal commands on Windows
+
+**Double-click `start_gui.bat`** in the extracted project folder. It sets up a local Python environment on first launch (Python 3.11/3.12 and Internet required) and opens the Gradio interface in your browser. Keep the launcher window open while using it.
+
+**Run an encounter** lets you select galaxy parameters, particle counts, solver, integration settings, and animation options. **Replay a saved run** lets you change the camera and FPS without rerunning gravity. Results are saved under `results/runs/`.
+
+For manual setup: `pip install -r requirements.txt -r requirements-fast.txt -r requirements-gui.txt` and `python app.py`.
+
+See [`docs/GUI_GUIDE.md`](docs/GUI_GUIDE.md) for a detailed walkthrough. This is a local UI only; it does not make the physical model scientifically validated.
+
 ## Status (important)
 
 - **Working/tested:** softened direct gravity, Barnes–Hut tree gravity, leapfrog, particle structure, saved snapshots, exact isotropic Plummer sphere, analytic density profiles, illustrative disk–bulge–halo sampling, simple parabolic encounter, basic diagnostics.
@@ -73,3 +83,43 @@ See `docs/WALKTHROUGH.md` for a conceptual lesson, `docs/VALIDATION.md` for the 
 - Barnes & Hut (1986), tree algorithm: https://doi.org/10.1038/324446a0
 - Vasiliev (2019), AGAMA: https://doi.org/10.1093/mnras/sty2672
 - AGAMA three-component worked example: https://github.com/GalacticDynamics-Oxford/Agama/blob/master/py/example_self_consistent_model_bdh.py
+
+## Higher-resolution galaxy animation (V1.1)
+
+The older `mice_preview.py` is intentionally a tiny static demonstration. The new `mice_animation.py` evolves a larger **live** particle system, saves all selected frames to a replayable `.npz`, and exports a GIF or MP4. It shows disk and bulge particles but hides halo particles by default; the halo still contributes gravity.
+
+Install the optional compiled acceleration dependency:
+
+```bash
+pip install -r requirements.txt -r requirements-fast.txt
+```
+
+Run a 2,500-particle encounter (1,600 stellar disk, 200 bulge, 700 halo):
+
+```bash
+python -m experiments.mice_animation --format both
+```
+
+For a higher-resolution run like the included example (3,500 live particles, including 2,600 disk stars):
+
+```bash
+python -m experiments.mice_animation --disk 1300 --bulge 100 --halo 350 --steps 240 --dt 0.006 --save-every 4 --format both
+```
+
+All particle counts are **per galaxy**, so the total count is twice their sum. The optional `--solver fast` uses Numba-compiled **direct summation** (the same softened force law as `gravity/direct.py`, with O(N) temporary memory). You can select `--solver direct` or `--solver tree` to run the original two implementations, although these are significantly slower at high counts. The first Numba call includes one-time compilation overhead.
+
+Outputs:
+
+- `results/mice_animation_trajectory.npz`: saved times, full positions and velocities, masses, particle IDs, component IDs, and metadata
+- `results/mice_animation.gif`: automatically looping animation (Pillow writer)
+- `results/mice_animation.mp4`: compressed video (requires FFmpeg available to Matplotlib)
+
+To **rerender the same simulation without recalculating gravity**, use:
+
+```bash
+python -m experiments.mice_animation --load results/mice_animation_trajectory.npz --view xy --lim 1.8 --fps 24 --format mp4
+```
+
+Useful options: `--disk`, `--bulge`, `--halo`, `--seed`, `--steps`, `--dt`, `--save-every`, `--fps`, `--view xy|xz|both`, `--lim`, `--format gif|mp4|both`, `--show-halo`, `--solver fast|direct|tree`, `--name my_run`. Use a unique `--name` for parameter comparisons so files are not overwritten.
+
+**Scientific limitation:** More particles help visualize fine structure but don't fix the approximate velocity distributions in `native.mice_preview`. The animations remain illustrative until the disk–bulge–halo equilibrium model, timestep/softening convergence, and encounter configuration are verified and validated. A bigger N is not equivalent to a converged scientific result. See `docs/VALIDATION.md`.
