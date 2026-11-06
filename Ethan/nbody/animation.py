@@ -14,14 +14,14 @@ def render(times, positions, components, galaxies, path, fps=15, lim=1.2,
                             squeeze=False)
     axs = axs[0]
     colors = ['#5bd5fb', '#ffb66e']
-    displayed = (components <= 1) if not show_halo else np.ones(len(components), dtype=bool)
+    displayed = ((components <= 1) | (components == 3)) if not show_halo else np.ones(len(components), dtype=bool)
     artists = []
     for ax, panel in zip(axs, panels):
         dims = projections[panel]
         series = []
         for gid in (0, 1):
             mask = displayed & (galaxies == gid)
-            disk = mask & (components == 0)
+            disk = mask & ((components == 0) | (components == 3))
             bulge = mask & (components == 1)
             halo = mask & (components == 2)
             for subset, size, alpha in ((disk, 1.1, 0.72), (bulge, 2.5, 0.86),
@@ -37,7 +37,9 @@ def render(times, positions, components, galaxies, path, fps=15, lim=1.2,
         ax.grid(alpha=.08)
         artists.append((dims, series))
     title = fig.suptitle('')
-    fig.text(.5, .012, 'Preview only: isolated disk stability and Mice reconstruction are not validated',
+    note = ('Analytic Plummer DF: finite-N stability requires validation' if np.any(components==3)
+            else 'Preview only: isolated disk stability and Mice reconstruction are not validated')
+    fig.text(.5, .012, note,
              ha='center', fontsize=8)
     fig.tight_layout(rect=(0, .04, 1, .95))
 

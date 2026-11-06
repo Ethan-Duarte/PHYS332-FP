@@ -24,3 +24,19 @@
 12. Predefine tidal-tail metrics and sample at equal times after *actual* periapsis; use seed variability and convergence bands to defend conclusions.
 
 Thresholds, adopted source measurements, and code/initial-condition revisions must be recorded before presenting results as validated.
+
+## Version 1.4: implemented diagnostics and remaining acceptance gates
+
+- `nbody/diagnostics.py`: vectorized/compiled softened pairwise energy, isolated disk/sphere structural time series, truncated/native profile CDF comparison, and exported CSV/PNG/JSON. A **screening pass** means only that selected threshold checks passed over that particular duration. The test must be repeated with different seeds, timesteps, force settings and particle counts.
+- `nbody/solver_study.py`: initializes all solvers from the **same** particle realization, measures acceleration errors relative to compiled direct summation, compares full-trajectory time, endpoint energy and structural galaxy separation. Long-time per-particle RMS separation is not itself a physical convergence metric for chaotic encounters; a future version must quantify convergence of macroscopic tidal metrics.
+- AGAMA is code-integrated as a selectable generator and automatically caches a snapshot, but the compiled extension is unavailable in the build environment. Do not mark the disk–bulge–halo galaxy as physically validated until this backend has run, shown consistent component masses/velocity distributions, and passed isolated stability at converged resolution.
+- The Mice preset adopts Barnes's published nominal pericenter/orientations; it is **not** yet fitted to the observed Mice's sky projection, line-of-sight velocity gradients, or tail geometry. No observational validation is claimed.
+
+### Initial screening demonstration (2026-11-05)
+
+| Case | Particle count | Duration | Radius drift | Thickness drift | Max sampled energy drift | Screening |
+|---|---:|---:|---:|---:|---:|---|
+| Isolated analytic Plummer | 500 | 1.00 | −3.63% | N/A | 0.00229% | Pass |
+| Isolated native preview disk–bulge–halo | 600 | 0.16 | +17.08% | +99.59% | 0.0179% | Fail |
+
+The second case explicitly demonstrates that nearly conserved total energy does not imply approximate collisionless equilibrium. The contrast depends on the stated resolution, timestep, softening and sampling; it is not a universal comparison of galaxy families.

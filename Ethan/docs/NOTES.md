@@ -26,3 +26,13 @@ Source links: Barnes (2004) https://doi.org/10.1111/j.1365-2966.2004.07725.x ; A
 ### V1.3 update, 2026-11-03
 
 GUI enhancements completed: cancel event, compiled Barnes–Hut force traversal (compared with original), interactive 3D Plotly viewer with self-contained HTML export, arbitrary initial relative position/velocity vectors, offline trajectory replay, and per-snapshot force-comparison tab. AGAMA equilibrium initial conditions are **not** validated or enabled. A working animated collision is not yet evidence of an astrophysically validated Mice reconstruction. Full-resolution convergence and observational reconstruction remain the next core milestones.
+
+### V1.4 — 2026-11-05
+
+- Retain the V1.3 interactive viewer, cancellation, and all gravitational solvers. New experiment mode: isolated galaxy (Plummer analytical DF / disk–bulge–halo native preview / optional AGAMA candidate / saved snapshot).
+- Add `diagnostics.py` for isolated structural drift, softened energy and sampled-vs-analytic density CDFs, and explicit **screening pass/fail**, never silently equating this to validation.
+- Add matched solver evolution (`solver_study.py`) using identical initial particles. Distinguish force accuracy, numerical energy drift, full evolution time, and final particle-position discrepancies; early performance results favor compiled direct summation at low N.
+- Freeze Mice reference **nominal** parameters: Barnes 2004 parabolic rp=0.25, disks (25°, −30°) and (40°, 60°), eps=0.0125, dt=1/512. Our initial separation and viewing frame are still development choices, so observational fit is incomplete.
+- AGAMA code adapted toward documented DF API; extension unavailable here. Its outputs remain equilibrium **candidates** until masses, units, kinematics and long-term isolated stability are measured.
+- Use saved model snapshots to avoid repeated expensive AGAMA generation. When reused for both progenitors the particle noise is correlated; future releases can support independent seeded samples from one converged DF.
+- Defer GUI website deployment, other galaxy types and multiple-body encounters until a robust physical baseline exists.

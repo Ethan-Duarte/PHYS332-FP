@@ -12,7 +12,7 @@ COLORS = ('#5bd5fb', '#ffb66e')
 
 
 def _sample(component, origin, show_halo, max_points):
-    indices = np.flatnonzero((component <= 1) if not show_halo else np.ones(len(component), bool))
+    indices = np.flatnonzero(((component <= 1) | (component == 3)) if not show_halo else np.ones(len(component), bool))
     if len(indices) > max_points:
         indices = np.sort(np.random.default_rng(2026).choice(indices, max_points, replace=False))
     return indices, [indices[origin[indices] == g] for g in sorted(set(origin[indices]))]
