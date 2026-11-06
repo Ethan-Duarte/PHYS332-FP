@@ -1,6 +1,6 @@
 # Cumulative working bibliography (N-body galaxy project)
 
-Updated 2026-11-02. These are starting references to read and preserve, **not** a claim that every paper has been reviewed in full. Model selection and numerical methods should cite the original sources.
+Updated 2026-11-06. These are starting references to read and preserve, **not** a claim that every paper has been reviewed in full. Model selection and numerical methods should cite the original sources.
 
 ## Galaxy distributions / stellar structure
 
@@ -49,3 +49,10 @@ Updated 2026-11-02. These are starting references to read and preserve, **not** 
 - Ludlow et al. (2021), spurious stellar heating: https://doi.org/10.1093/mnras/stab2770
 - Oberkampf & Trucano (2002), simulation V&V: https://doi.org/10.1016/S0376-0421(02)00005-2
 - Heitmann et al. (2008), cosmic code comparisons: https://doi.org/10.1088/1749-4699/1/1/015003
+
+## V1.4.1: transient stellar spirals and disk heating
+
+- Toomre (1964), axisymmetric stellar-disk stability: https://articles.adsabs.harvard.edu/pdf/1964ApJ...139.1217T (also listed above).
+- Fujii et al. (2011), *The Dynamics of Spiral Arms in Pure Stellar Disks*: https://doi.org/10.1088/0004-637X/730/2/109
+- Sellwood & Masters (2022), *Spirals in Galaxies*: https://doi.org/10.1146/annurev-astro-052920-104505
+- Official AGAMA installation instructions (current): https://github.com/GalacticDynamics-Oxford/Agama/blob/master/INSTALL

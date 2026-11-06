@@ -1,4 +1,4 @@
-"""N-Baddies V1.4: numerical studies, isolation screens, and 3D encounters."""
+"""N-Baddies V1.4.1: spiral-mode diagnostics and equilibrium dependency status."""
 import json
 import re
 from datetime import datetime
@@ -19,6 +19,8 @@ from nbody.integrate import evolve
 from nbody.io import load_trajectory, save_trajectory, load, save
 from nbody.galaxies.sources.native import plummer
 from nbody.diagnostics import inspect_isolation, encounter_report, structure
+from nbody.spirals import spiral_study
+from nbody.galaxies.agama_status import message as agama_message, status as agama_status
 from nbody.solver_study import compare_trajectories
 from nbody.viewer import write_viewer, viewer_iframe
 from nbody.benchmarks import compare
@@ -114,7 +116,7 @@ def field(name, control):
 
 def _status(message, running=True):
     return (gr.update(), gr.update(), gr.update(), gr.update(), gr.update(),
-            gr.update(), gr.update(), message, gr.update(interactive=not running))
+            gr.update(), gr.update(), message, gr.update(interactive=not running), gr.update())
 
 
 def cancel_active():
@@ -173,6 +175,8 @@ def simulate(*values, progress=gr.Progress()):
             else:
                 backend={'Native preview (not equilibrium)':'preview',
                          'AGAMA (equilibrium candidate)':'agama'}[backend]
+                if backend=='agama' and not agama_status()['available']:
+                    raise gr.Error('AGAMA is not importable in the GUI Python environment. See the AGAMA status above.')
                 g1=galaxy(config,backend)
                 if backend=='agama':
                     filename=f'agama_{datetime.now():%Y%m%d_%H%M%S}.npz'
@@ -217,15 +221,25 @@ def simulate(*values, progress=gr.Progress()):
         save_trajectory(trajectory,snapshots,metadata)
         (folder/'config.json').write_text(json.dumps(metadata,indent=2))
         progress(.99,desc='Computing run diagnostics')
+        spiral_plot_path = None
         if isolated:
             report,_=inspect_isolation(snapshots,float(p['eps']),folder,backend)
             if p['model']=='Disk–bulge–halo' and (backend in ('preview','agama') or saved_config):
                 from nbody.diagnostics import profile_checks
                 profile_checks(initial,saved_config or config,folder,
                                'preview' if 'preview' in backend else 'agama')
+            if np.any(initial.component == 0):
+                spiral_report, spiral_plot_path = spiral_study(
+                    snapshots, float((saved_config or config)['disk']['scale']),
+                    float(p['eps']), folder)
             scientific=f'Isolation **{report["verdict"]}** · '
             scientific+=f'Δr50 = {100*report["relative_changes"]["r50"]:+.2f}% · '
             scientific+=f'ΔE/|E0| = {report["relative_energy_change"]:+.3g}' if report['relative_energy_change'] is not None else ''
+            if spiral_plot_path:
+                scientific += (f'\n\nMean annular A₂: peak **{spiral_report["A2_peak"]:.3f}** at '
+                               f't={spiral_report["time_of_A2_peak"]:.3f}; '
+                               f'noise RMS ≈ {spiral_report["noise_rms_at_peak"]:.3f}. '
+                               'Annular modes, estimated Q and phase profiles saved.')
             scientific+='\n\n**This screening alone does not validate the galaxy.**'
             report_file='isolation_report.json'
         else:
@@ -242,7 +256,7 @@ def simulate(*values, progress=gr.Progress()):
                f'{label}\n\n{summary}\n\n{scientific}\n\n'
                f'Diagnostics: `{report_file}` and CSV in `results/runs/{folder.name}/`\n\n'
                f'Backend: **{backend}** · Saved to `results/runs/{folder.name}/`',
-               gr.update(interactive=True))
+               gr.update(interactive=True), str(spiral_plot_path) if spiral_plot_path else None)
     except Exception as exc:
         yield _status(f'**Run failed:** `{type(exc).__name__}: {exc}`. See launcher window for details.',False)
     finally:
@@ -261,6 +275,28 @@ def replay_saved(selected, lim, show_halo, max_points, fps, export, progress=gr.
     view, curve, gif, mp4, html, summary = visualizations(path, folder, lim, show_halo,
                                                            max_points, fps, export)
     return view, curve, gif, mp4, html, summary
+
+
+def analyze_saved_disk(selected):
+    """Run disk diagnostics from saved frames without recomputing gravity."""
+    if not selected:
+        raise gr.Error('Select a saved trajectory.')
+    path=(RESULTS/selected).resolve()
+    if not path.is_relative_to(RESULTS.resolve()):
+        raise gr.Error('Invalid trajectory path.')
+    t,x,v,m,comp,ids,meta=load_trajectory(path)
+    if meta.get('setup')!='Isolated galaxy' or not np.any(comp==0):
+        raise gr.Error('Choose an isolated disk–bulge–halo trajectory, not a merger or Plummer sphere.')
+    from nbody.particles import Particles
+    snapshots=[(float(time),Particles(a,b,m,comp,ids)) for time,a,b in zip(t,x,v)]
+    report, plot = spiral_study(snapshots, meta['config']['disk']['scale'], meta['eps'], path.parent)
+    if plot is None:
+        return None,None,None,None,report['caution']
+    return (str(plot), str(path.parent/'spiral_phase.png'), str(path.parent/'spiral_modes.csv'),
+            str(path.parent/'spiral_annuli.csv'),
+            f'**A₂ peak:** {report["A2_peak"]:.3f} at t={report["time_of_A2_peak"]:.3f} '
+            f'· estimated mode-to-noise ratio {report["A2_to_noise_at_peak"]:.2f}. '
+            '**This is a numerical diagnostic, not a validated spiral interpretation.**')
 
 
 def size_text(disk, bulge, halo, steps, solver, setup):
@@ -305,7 +341,7 @@ def run_full_study(n,steps,theta,eps,progress=gr.Progress()):
 
 
 with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
-    gr.Markdown('# N-Baddies V1.4 · Galaxy Dynamics Lab\nGenerate isolated systems, investigate a Barnes-inspired Mice encounter, compare force solvers, and replay results in 3D.')
+    gr.Markdown('# N-Baddies V1.4.1 · Spiral Diagnostics\nGenerate isolated systems, investigate a Barnes-inspired Mice encounter, compare force solvers, and replay results in 3D.')
     gr.Markdown('**Scientific status:** Native disk velocities remain approximate. AGAMA is an optional DF-based equilibrium candidate, not yet run-verified here. Isolation screening and convergence are required before claiming a physically validated Mice reconstruction.')
     with gr.Tab('Run a simulation'):
         with gr.Row():
@@ -318,6 +354,8 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
                     field('snapshot', gr.Dropdown(choices=available_galaxies(),value=None,label='Saved galaxy .npz (only used for Saved snapshot)'))
                     refresh_galaxies=gr.Button('Refresh saved galaxies',size='sm')
                     field('Q',gr.Slider(1,3,value=1.5,step=.1,label='Target Toomre Q near 1 disk scale (AGAMA only)'))
+                    agama_info=gr.Markdown(agama_message())
+                    agama_refresh=gr.Button('Check AGAMA availability',size='sm')
                 with gr.Accordion('Galaxy particles and seed', open=True):
                     field('disk', gr.Slider(50, 5000, value=800, step=50, label='Disk particles / galaxy'))
                     field('bulge', gr.Slider(10, 500, value=100, step=10, label='Bulge particles / galaxy'))
@@ -373,6 +411,7 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
                 status = gr.Markdown('Configure a run, then click **Run simulation**. You can rotate and zoom the 3D viewer with your mouse.')
                 viewer = gr.HTML(label='Interactive 3D viewer · drag to rotate; use the controls below')
                 curve = gr.Plot(label='Encounter separation / isolated structure')
+                spiral_image = gr.Image(label='Isolated disk: Fourier modes, heating and Q estimate')
                 with gr.Row():
                     gif_file = gr.File(label='Optional GIF')
                     mp4_file = gr.File(label='Optional MP4')
@@ -400,6 +439,18 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
             replay_html = gr.File(label='Download interactive 3D HTML')
             replay_gif = gr.File(label='Optional GIF')
             replay_mp4 = gr.File(label='Optional MP4')
+    with gr.Tab('Analyze disk spirals'):
+        gr.Markdown('Analyze an **existing isolated disk run** without recomputing gravity. Fourier amplitudes are measured in radial annuli to avoid cancellation of winding patterns. Q is only an approximate axisymmetric diagnostic.')
+        with gr.Row():
+            spiral_saved=gr.Dropdown(choices=available_runs(),label='Saved isolated disk trajectory',scale=4)
+            spiral_refresh=gr.Button('Refresh',scale=1)
+            spiral_button=gr.Button('Analyze saved disk',variant='primary',scale=2)
+        spiral_note=gr.Markdown()
+        spiral_graph=gr.Image(label='Fourier modes, heating and approximate Toomre Q')
+        spiral_phase=gr.Image(label='A₂ phase and amplitude across radius')
+        with gr.Row():
+            spiral_csv=gr.File(label='Mode timeline CSV')
+            spiral_annuli=gr.File(label='Annular measurements CSV')
     with gr.Tab('Compare gravitational solvers'):
         gr.Markdown('Compare accelerations at a **single initial Mice-style snapshot**. Fast direct summation is the reference. These timings exclude Numba compilation, and are not yet an end-to-end merger convergence test.')
         with gr.Row():
@@ -442,6 +493,11 @@ Native disk–bulge–halo velocities are heuristic. AGAMA can be selected expli
 This GUI is intended for exploring and benchmarking the numerical system; a publication-quality Mice reconstruction requires equilibrium initial conditions, convergence testing, and observational comparisons.
 ''')
 
+    agama_refresh.click(agama_message, outputs=agama_info)
+    app.load(agama_message, outputs=agama_info)
+    spiral_refresh.click(lambda: gr.update(choices=available_runs()),outputs=spiral_saved)
+    spiral_button.click(analyze_saved_disk,inputs=spiral_saved,
+                        outputs=[spiral_graph,spiral_phase,spiral_csv,spiral_annuli,spiral_note])
     setup = FIELD_CONTROLS[FIELD_NAMES.index('setup')]
     setup.change(lambda mode: (gr.update(visible=mode=='Mice encounter'),
                                gr.update(visible=mode=='Custom encounter')),
@@ -459,7 +515,7 @@ This GUI is intended for exploring and benchmarking the numerical system; a publ
     app.load(size_text, inputs=[disk,bulge,halo,steps,solver,setup], outputs=work)
     run_button.click(simulate, inputs=FIELD_CONTROLS,
                      outputs=[viewer,curve,gif_file,mp4_file,trajectory_file,config_file,
-                              html_file,status,run_button], concurrency_limit=1)
+                              html_file,status,run_button,spiral_image], concurrency_limit=1)
     stop_button.click(cancel_active, outputs=status, queue=False)
     refresh.click(lambda: gr.update(choices=available_runs()), outputs=saved)
     bench_button.click(run_benchmark,inputs=[bench_n,bench_theta,bench_eps],outputs=[bench_result,bench_note])

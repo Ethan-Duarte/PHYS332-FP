@@ -36,3 +36,10 @@ GUI enhancements completed: cancel event, compiled Barnes–Hut force traversal 
 - AGAMA code adapted toward documented DF API; extension unavailable here. Its outputs remain equilibrium **candidates** until masses, units, kinematics and long-term isolated stability are measured.
 - Use saved model snapshots to avoid repeated expensive AGAMA generation. When reused for both progenitors the particle noise is correlated; future releases can support independent seeded samples from one converged DF.
 - Defer GUI website deployment, other galaxy types and multiple-body encounters until a robust physical baseline exists.
+
+### V1.4.1 — 2026-11-06
+
+- Added annular, mass-weighted Fourier modes `A_m(R,t)`, `m=1..4`, plus phase and finite-N RMS noise floor. Average the **absolute annular amplitudes**, not the complex amplitudes over the whole disk, to avoid spiral-phase cancellation. Reuse the exact saved trajectory for reanalysis.
+- Measure `sigma_R` and disk thickness alongside `A_m`. Estimate Toomre `Q` with κ inferred from azimuthally averaged softened live-particle force, but label it **approximate**, especially for non-equilibrium disks. Low particle counts may make annuli unresolvable.
+- Added live AGAMA import status in the GUI, identifying the Python interpreter; the compiled AGAMA dependency remains absent in our environment and its adapter remains unverified. No fallback to preview models on import failure.
+- **Validation unchanged:** native disk velocity fields remain heuristic and have demonstrated major relaxation; amplitude of a transient `m=2` feature does not prove a true spiral pattern. Research goal is still a stable AGAMA-derived reference disk for V1.5, then the Mice comparison.

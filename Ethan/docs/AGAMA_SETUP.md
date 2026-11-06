@@ -1,20 +1,37 @@
-# Optional AGAMA backend: status and setup
+# AGAMA: dependency status and installation
 
-- Reference: https://github.com/GalacticDynamics-Oxford/Agama
-- Reference workflow: https://github.com/GalacticDynamics-Oxford/Agama/blob/master/py/example_self_consistent_model3.py
-- Paper: https://doi.org/10.1093/mnras/sty2672
+The file `nbody/galaxies/sources/agama.py` is an **adapter** that constructs a three-component self-consistent equilibrium *candidate* using AGAMA's documented API. It does **not** contain or substitute for the AGAMA C++/Python library, and the backend has **not** been run-verified in the release environment.
 
-`nbody/galaxies/sources/agama.py` implements a three-component model based on the documented API: a vertically sech² exponential disk, Hernquist (`gamma=1`) spheroid and cored Dehnen (`gamma=0`) halo; construct initial density potential, derive a quasi-isothermal disk DF and quasi-spherical bulge/halo DFs, iterate a self-consistent potential, then sample particles from each DF.
+## Check your environment first
 
-AGAMA includes a compiled extension and is **not included in `requirements*.txt`**. Consult its official install instructions and a compatible Python version / compiler. On Windows, a supported Linux/WSL setup may be easier than compiling extensions directly. Once available in the same Python environment, verify with:
+Open the GUI's **Initial-condition model** accordion: it shows whether `import agama` succeeds **in the interpreter running the GUI**. You can click **Check AGAMA availability** again after installation. The message identifies the exact Python executable being used.
 
-```python
-import agama
-print(agama.__file__)
+You can independently check with:
+
+```powershell
+.\.venv\Scripts\python.exe -c "import sys; print(sys.executable); import agama; print(agama.__file__)"
 ```
 
-Then choose **AGAMA (equilibrium candidate)** in the GUI; it will not silently switch to native preview on failure. Save the returned snapshot, inspect the component masses and measured density profiles, check the gravitational constant / AGAMA units against `G=1`, and run isolated stability for several dynamical times. Investigate any mass mismatch between the generated DF and the requested input configuration before treating it as equilibrium.
+To attempt installation in that same environment:
 
-AGAMA has its own random sampler; the adapter calls `agama.setRandomSeed(seed)` per the documented API. Even with a seed, save the exact particle snapshot for platform-independent reproducibility.
+```powershell
+.\.venv\Scripts\python.exe -m pip install -U pip setuptools wheel numpy
+.\.venv\Scripts\python.exe -m pip install agama
+```
 
-**Environment note:** AGAMA was unavailable in the build environment and its installation could not be completed there; the adapter has not been run against the extension. Do not cite the adapter as a validated galaxy generator yet.
+**Windows build note:** AGAMA contains compiled C++ code. Installation may need Microsoft C++ Build Tools and a correctly initialized MSVC environment (e.g., an x64 Developer Command Prompt / `vcvarsall.bat`); dependencies such as GSL may also need compiling. Do not assume a standard pip installation will work on every Windows machine. See the **current** official installation guide before changing compiler options:
+
+https://github.com/GalacticDynamics-Oxford/Agama/blob/master/INSTALL
+
+Official three-component reference example:
+https://github.com/GalacticDynamics-Oxford/Agama/blob/master/py/example_self_consistent_model3.py
+
+## What to verify once AGAMA imports
+
+1. Generate a candidate; check that disk/bulge/halo sampled masses and density profiles match the requested parameters.
+2. Compare orbit speeds and velocity dispersions against the equilibrium DF solution.
+3. Evolve in isolation for several orbital periods; track structural and kinematic drift with V1.4.1 diagnostics.
+4. Repeat at different particle counts, time steps, softening lengths and random seeds.
+5. Save an actual particle snapshot with metadata so every gravitational solver uses exactly the same initial realization.
+
+AGAMA import success **does not imply** the adapter, masses, units, or sampled galaxy have been validated. The native preview is still explicitly non-equilibrium, and the GUI will **not** silently switch to it when AGAMA fails.

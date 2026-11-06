@@ -1,6 +1,27 @@
-# N-Baddies V1.4 — Galaxy Dynamics Lab
+# N-Baddies V1.4.1 — Spiral Diagnostics & Galaxy Dynamics Lab
 
 A student-built gravitational N-body simulator with a local browser GUI, controllable 3D playback, isolated-galaxy diagnostic experiments, a Barnes-inspired Mice encounter, and direct-versus-Barnes–Hut trajectory comparisons.
+
+## What changed in V1.4.1
+
+- **Automatic Fourier diagnostics for isolated disk models:** annular `m=1...4` stellar Fourier amplitudes, finite-particle noise RMS, radial `m=2` phase, radial velocity dispersion, disk thickness, and an **approximate** axisymmetric Toomre `Q` calculated from the live softened gravitational potential.
+- **Analyze disk spirals** GUI tab: reanalyze saved isolated-disk trajectories without another N-body calculation. Exports two plots, `spiral_modes.csv`, `spiral_annuli.csv`, `spiral_report.json`.
+- **AGAMA availability panel** in the galaxy configuration: shows why the optional compiled extension cannot be imported in the GUI's active interpreter and where to install it. Does not attempt or claim automatic AGAMA installation or adapter validation.
+- **Regression tests** for Fourier modes, saved trajectories, and dependency status.
+
+See `docs/SPIRAL_DIAGNOSTICS.md` for the mathematics and interpretation limits. The 3D viewer, cancellation, Mice preset and solver comparisons remain unchanged.
+
+**Try it in the GUI:** select **Isolated galaxy → Disk–bulge–halo → Native preview**, use at least ~800 stellar disk particles, run, and inspect the spiral diagnostics chart. Use **Analyze disk spirals** to revisit a saved result. Plummer models have no disk Fourier diagnostics.
+
+**Standalone example:**
+
+```bash
+python -m experiments.spiral_study --particles 1500 --steps 360 --dt 0.003 --save-every 12
+# Or recompute the analysis from an already-saved isolated disk trajectory:
+python -m experiments.spiral_study --trajectory results/spiral_study/isolation_trajectory.npz
+```
+
+The included `results/v141_disk_demo/` is a reproducible **native preview demonstration**, not a validated equilibrium galaxy. Its finite particle noise and severe structural heating should be part of the interpretation.
 
 ## Launching on Windows
 
