@@ -159,7 +159,9 @@ def simulate(*values, progress=gr.Progress()):
                                  relative_velocity=[p[k] for k in ('vx','vy','vz')])
         backend=p['generator']
         saved_config=None
-        yield _status('Constructing initial conditions…')
+        generation_report=None
+        extra_galaxy=None
+        yield _status('Constructing initial conditions… AGAMA self-consistency can take substantial time; cancel is checked after its compiled computation returns.')
         if p['model']=='Plummer (analytic DF)':
             if not isolated: raise gr.Error('Plummer is currently offered for isolated tests only.')
             initial=plummer(sum(config['particles'].values()),
@@ -177,18 +179,32 @@ def simulate(*values, progress=gr.Progress()):
                          'AGAMA (equilibrium candidate)':'agama'}[backend]
                 if backend=='agama' and not agama_status()['available']:
                     raise gr.Error('AGAMA is not importable in the GUI Python environment. See the AGAMA status above.')
-                g1=galaxy(config,backend)
                 if backend=='agama':
-                    filename=f'agama_{datetime.now():%Y%m%d_%H%M%S}.npz'
-                    save(GALAXIES/filename,g1,dict(backend='agama',config=config,
-                         caveat='Candidate: requires isolated tests and resolution study'))
+                    from nbody.galaxies.sources.agama import generate as generate_agama
+                    candidates, generation_report = generate_agama(
+                        config, with_report=True, realizations=1 if isolated else 2)
+                    if isolated:
+                        g1 = candidates
+                    else:
+                        g1, extra_galaxy = candidates
+                    filename=f'agama_{datetime.now():%Y%m%d_%H%M%S}'
+                    save(GALAXIES/f'{filename}_A.npz',g1,dict(backend='agama',config=config,
+                         generation_report=generation_report, validation='candidate; untested isolation'))
+                    if extra_galaxy is not None:
+                        save(GALAXIES/f'{filename}_B.npz',extra_galaxy,dict(backend='agama',config={**config,'seed':config['seed']+1},
+                             generation_report=generation_report, validation='candidate; untested isolation'))
+                else:
+                    g1=galaxy(config,backend)
             if isolated:
                 initial=g1
             else:
-                if backend=='preview':
+                if extra_galaxy is not None:
+                    g2=extra_galaxy
+                elif backend=='preview':
                     g2=galaxy({**config,'seed':config['seed']+1},'preview')
                 else:
-                    # Reuse the saved equilibrium realization (not independent noise).
+                    # A single cached snapshot cannot provide an independent realization.
+                    # This case is recorded in metadata, not hidden.
                     g2=g1
                 if p['setup']=='Custom encounter':
                     initial=relative_pair(g1,g2,config['encounter']['relative_position'],
@@ -214,12 +230,15 @@ def simulate(*values, progress=gr.Progress()):
         metadata=dict(config=config,backend=backend,model=p['model'],setup=p['setup'],
                       solver=p['solver'],eps=float(p['eps']),theta=float(p['theta']),
                       dt=float(p['dt']),steps=steps,save_every=save_every,
-                      cancelled=CANCEL.is_set(),
+                      cancelled=CANCEL.is_set(), generation_report=generation_report,
+                      correlated_realizations=(not isolated and g2 is g1),
                       caveat='Native preview is NOT equilibrium; AGAMA output requires isolated validation')
         trajectory=folder/'run_trajectory.npz'
         save(folder/'initial_particles.npz',initial,metadata)
         save_trajectory(trajectory,snapshots,metadata)
         (folder/'config.json').write_text(json.dumps(metadata,indent=2))
+        if generation_report:
+            (folder/'agama_generation_report.json').write_text(json.dumps(generation_report,indent=2))
         progress(.99,desc='Computing run diagnostics')
         spiral_plot_path = None
         if isolated:
@@ -251,6 +270,8 @@ def simulate(*values, progress=gr.Progress()):
                             bool(p['show_halo']),int(p['max_points']),int(p['fps']),
                             'None' if CANCEL.is_set() else p['export'])
         label='**Cancelled; partial trajectory saved.**' if CANCEL.is_set() else '**Simulation complete.**'
+        if generation_report:
+            label += ' AGAMA DF model generated; isolation and convergence tests still required.'
         progress(1,desc='Saved')
         yield (view,curve,gif,mp4,str(trajectory),str(folder/'config.json'),html,
                f'{label}\n\n{summary}\n\n{scientific}\n\n'
@@ -299,6 +320,32 @@ def analyze_saved_disk(selected):
             '**This is a numerical diagnostic, not a validated spiral interpretation.**')
 
 
+def validate_saved_galaxy(selected, dt, steps, eps, solver, progress=gr.Progress()):
+    """Single-realization isolation and half-timestep comparison (not full validation)."""
+    if not selected:
+        raise gr.Error('Choose a saved AGAMA or other isolated galaxy snapshot.')
+    if not RUN_LOCK.acquire(blocking=False):
+        raise gr.Error('Another simulation is running.')
+    try:
+        from nbody.validation import validate_initial_state
+        model, meta = load(GALAXIES/Path(selected).name)
+        folder = RUNS/f'validation_{datetime.now():%Y%m%d_%H%M%S_%f}'
+        progress(0, desc='Isolated baseline and half-timestep refinement')
+        report = validate_initial_state(model, folder, dt=float(dt), steps=int(steps),
+             eps=float(eps), save_every=max(1,int(steps)//12),
+             backend=meta.get('backend','saved'), solver=solver)
+        progress(1, desc='Saved both tests')
+        short=(f'**{len(model.m):,} particles** · total time **{report["total_time"]:.3f}** · '
+               f'base Δr50 = {100*report["base"]["relative_changes"]["r50"]:+.2f}%, '
+               f'half-dt Δr50 = {100*report["half_dt"]["relative_changes"]["r50"]:+.2f}%. '
+               f'Refinement discrepancy = {100*report["refined_comparison"]["r50_relative"]:.2f}%.\n\n'
+               '**Single-run numerical screening only.** Still repeat with independent seeds, '
+               'multiple particle resolutions and softening values.')
+        return short,str(folder/'validation_comparison.json'),str(folder/'base'/'isolation_diagnostics.png'),str(folder/'half_dt'/'isolation_diagnostics.png')
+    finally:
+        RUN_LOCK.release()
+
+
 def size_text(disk, bulge, halo, steps, solver, setup):
     n = (1 if setup=='Isolated galaxy' else 2)*(disk+bulge+halo)
     note = 'Pure-Python Barnes–Hut can be very slow; use the compiled version.' if 'Python' in solver else ''
@@ -341,8 +388,8 @@ def run_full_study(n,steps,theta,eps,progress=gr.Progress()):
 
 
 with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
-    gr.Markdown('# N-Baddies V1.4.1 · Spiral Diagnostics\nGenerate isolated systems, investigate a Barnes-inspired Mice encounter, compare force solvers, and replay results in 3D.')
-    gr.Markdown('**Scientific status:** Native disk velocities remain approximate. AGAMA is an optional DF-based equilibrium candidate, not yet run-verified here. Isolation screening and convergence are required before claiming a physically validated Mice reconstruction.')
+    gr.Markdown('# N-Baddies V1.5.1 · Equilibrium Galaxy Candidates\nGenerate isolated systems, investigate a Barnes-inspired Mice encounter, compare force solvers, and replay results in 3D.')
+    gr.Markdown('**Scientific status:** Native disk velocities remain approximate. AGAMA generation is integrated with supplied source and diagnostic output, but the native extension could not be compiled here; model validation is still required. Isolation screening and convergence are required before claiming a physically validated Mice reconstruction.')
     with gr.Tab('Run a simulation'):
         with gr.Row():
             with gr.Column(scale=1, min_width=310):
@@ -356,6 +403,7 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
                     field('Q',gr.Slider(1,3,value=1.5,step=.1,label='Target Toomre Q near 1 disk scale (AGAMA only)'))
                     agama_info=gr.Markdown(agama_message())
                     agama_refresh=gr.Button('Check AGAMA availability',size='sm')
+                    gr.Markdown('**AGAMA source included:** `vendor/Agama-master.zip`. On macOS use `bash scripts/install_agama_macos.sh`; on Windows use `scripts/install_agama_windows.bat` from an x64 VS Developer Command Prompt. AGAMA is optional; see `docs/AGAMA_SETUP.md`.')
                 with gr.Accordion('Galaxy particles and seed', open=True):
                     field('disk', gr.Slider(50, 5000, value=800, step=50, label='Disk particles / galaxy'))
                     field('bulge', gr.Slider(10, 500, value=100, step=10, label='Bulge particles / galaxy'))
@@ -439,6 +487,28 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
             replay_html = gr.File(label='Download interactive 3D HTML')
             replay_gif = gr.File(label='Optional GIF')
             replay_mp4 = gr.File(label='Optional MP4')
+    with gr.Tab('Test a saved equilibrium galaxy'):
+        gr.Markdown('Evolve **the same stored particle realization** in isolation with Δt and Δt/2. '
+                    'Reports structural drift and numerical refinement. **A screening pass is not full physical validation.** '
+                    'Use a previously generated AGAMA galaxy in the saved-galaxy library.')
+        with gr.Row():
+            validation_selected=gr.Dropdown(choices=available_galaxies(),label='Saved initial galaxy snapshot')
+            validation_refresh=gr.Button('Refresh galaxy library',size='sm')
+        with gr.Row():
+            validation_dt=gr.Number(value=.003,label='Coarse timestep Δt')
+            validation_steps=gr.Slider(20,800,value=80,step=20,label='Coarse timesteps')
+            validation_eps=gr.Number(value=.0125,label='Softening ε')
+            validation_solver=gr.Radio(['Fast direct','Barnes–Hut'],value='Fast direct',label='Solver')
+        validation_button=gr.Button('Run isolated stability and refinement check',variant='primary')
+        validation_text=gr.Markdown()
+        validation_json=gr.File(label='Validation screen report JSON')
+        with gr.Row():
+            validation_plot1=gr.Image(label='Coarse timestep')
+            validation_plot2=gr.Image(label='Half timestep')
+        validation_refresh.click(lambda: gr.update(choices=available_galaxies()),outputs=validation_selected)
+        validation_button.click(validate_saved_galaxy,
+            inputs=[validation_selected,validation_dt,validation_steps,validation_eps,validation_solver],
+            outputs=[validation_text,validation_json,validation_plot1,validation_plot2],concurrency_limit=1)
     with gr.Tab('Analyze disk spirals'):
         gr.Markdown('Analyze an **existing isolated disk run** without recomputing gravity. Fourier amplitudes are measured in radial annuli to avoid cancellation of winding patterns. Q is only an approximate axisymmetric diagnostic.')
         with gr.Row():
@@ -489,7 +559,7 @@ with gr.Blocks(title='N-Baddies | 3D Galaxy Lab') as app:
 - **Barnes–Hut (Python, slow):** original reference code; use only for tiny diagnostic cases.
 
 ### Physics limitations
-Native disk–bulge–halo velocities are heuristic. AGAMA can be selected explicitly if installed, but its code-unit normalization and equilibrium particle realizations need testing on your machine. The published Mice geometry is an approximate initialization, not a completed reconstruction.
+Native disk–bulge–halo velocities are heuristic. AGAMA can be selected explicitly if installed, but its code-unit normalization and equilibrium particle realizations need testing on your machine. The supplied AGAMA source archive is in `vendor/`. It must be compiled in your GUI Python environment before AGAMA generation works. The published Mice geometry is an approximate initialization, not a completed reconstruction.
 This GUI is intended for exploring and benchmarking the numerical system; a publication-quality Mice reconstruction requires equilibrium initial conditions, convergence testing, and observational comparisons.
 ''')
 
