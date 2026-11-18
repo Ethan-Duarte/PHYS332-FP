@@ -56,3 +56,18 @@ Updated 2026-11-06. These are starting references to read and preserve, **not** 
 - Fujii et al. (2011), *The Dynamics of Spiral Arms in Pure Stellar Disks*: https://doi.org/10.1088/0004-637X/730/2/109
 - Sellwood & Masters (2022), *Spirals in Galaxies*: https://doi.org/10.1146/annurev-astro-052920-104505
 - Official AGAMA installation instructions (current): https://github.com/GalacticDynamics-Oxford/Agama/blob/master/INSTALL
+
+
+## V1.5 additional primary materials from the user-supplied AGAMA-master archive
+
+- `vendor/Agama-master.zip` > `INSTALL` — build and prerequisites (NumPy, compiler, GSL). Official version: https://github.com/GalacticDynamics-Oxford/Agama/blob/master/INSTALL
+- `vendor/Agama-master.zip` > `py/example_self_consistent_model3.py` — three-component disk/bulge/halo DF and potential iteration. https://github.com/GalacticDynamics-Oxford/Agama/blob/master/py/example_self_consistent_model3.py
+- `vendor/Agama-master.zip` > `py/example_self_consistent_model_bdh.py` — more recent three-component parameterization and discussion of Toomre Q and disk stability. https://github.com/GalacticDynamics-Oxford/Agama/blob/master/py/example_self_consistent_model_bdh.py
+- `vendor/Agama-master.zip` > `doc/reference.tex` — AGAMA density, action, DF, units, and API reference. https://github.com/GalacticDynamics-Oxford/Agama
+
+
+## V1.6 initial-condition studies
+
+- Rodionov & Sotnikova (2006), iterative construction of equilibrium N-body models, https://arxiv.org/abs/astro-ph/0611176
+- Yurin & Springel (2014), GALIC, https://doi.org/10.1093/mnras/stu1421
+- Vasiliev (2019), AGAMA, https://doi.org/10.1093/mnras/sty2672

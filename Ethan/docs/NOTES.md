@@ -43,3 +43,14 @@ GUI enhancements completed: cancel event, compiled Barnes–Hut force traversal 
 - Measure `sigma_R` and disk thickness alongside `A_m`. Estimate Toomre `Q` with κ inferred from azimuthally averaged softened live-particle force, but label it **approximate**, especially for non-equilibrium disks. Low particle counts may make annuli unresolvable.
 - Added live AGAMA import status in the GUI, identifying the Python interpreter; the compiled AGAMA dependency remains absent in our environment and its adapter remains unverified. No fallback to preview models on import failure.
 - **Validation unchanged:** native disk velocity fields remain heuristic and have demonstrated major relaxation; amplitude of a transient `m=2` feature does not prove a true spiral pattern. Research goal is still a stable AGAMA-derived reference disk for V1.5, then the Mice comparison.
+
+
+## V1.5 modeling/implementation decisions (2026-11-06)
+
+- Supplied AGAMA source archive included verbatim under `vendor/`. A source zip is **not** an installed Python extension. Installation is deliberately separate from GUI dependency installation so missing GSL/MSVC does not prevent preview/Plummer use.
+- The adapter keeps code units `G=1`, uses negative AGAMA disk scale height `-zd/2` for a `sech²(z/zd)` target, and uses a spherical potential grid extending past the reference halo cutoff instead of the much-too-short V1.4 grid.
+- `QuasiIsothermal` disk DF sets sigma_R from a **target** Toomre Q at one radial scale; do not interpret target as realized Q until measured.
+- `QuasiSpherical` bulge/halo DFs are initialized from the initial potential; four self-consistency iterations update model densities and potential. Their final densities need not equal the initial analytic profiles.
+- Two fresh AGAMA progenitors now independently sample the same equilibrium smooth DF model using two seeds; cached single snapshots reused twice still have correlated noise and the run metadata records this.
+- Initial-isolation + dt/2 test is a **screen**. A numerical timestep-converged disk may still be physically wrong. Full validation requires particle-resolution/softening/seed studies and longer isolated evolution.
+- Tests with a mock AGAMA object validate Python API wiring only. No compiled AGAMA runtime test was possible here because GSL headers and the compiled extension are absent.

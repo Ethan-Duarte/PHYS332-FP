@@ -1,6 +1,52 @@
-# N-Baddies V1.4.1 — Spiral Diagnostics & Galaxy Dynamics Lab
+# N-Baddies V1.6 — initial-condition comparison
 
-A student-built gravitational N-body simulator with a local browser GUI, controllable 3D playback, isolated-galaxy diagnostic experiments, a Barnes-inspired Mice encounter, and direct-versus-Barnes–Hut trajectory comparisons.
+**New:** GUI tab **Virialize & relax galaxies**, global virial diagnostics using the softened force, two-stage isolated relaxation/restart, and the Windows PowerShell AGAMA build helper.
+
+- [V1.6 scientific workflow and equations](docs/V16_INITIAL_CONDITIONS.md)
+- [Exact Windows PowerShell AGAMA installation commands](docs/WINDOWS_AGAMA_POWERSHELL.md)
+- Optional demonstration: `python -m experiments.initial_condition_study`
+
+**Scientific boundary:** neither velocity rescaling nor unconstrained relaxation implies a self-consistent equilibrium galaxy. AGAMA's real C++ extension must still be installed and run, followed by isolation and convergence tests. The upstream source remains in `vendor/Agama-master.zip`.
+
+---
+
+# N-Baddies V1.5.1 — Windows + macOS Support
+
+A student-built gravitational N-body simulator with a local browser GUI, controllable 3D playback, isolated-galaxy diagnostic experiments, a Barnes-inspired Mice encounter, and direct-versus-Barnes–Hut trajectory comparisons. V1.5.1 adds macOS launch and AGAMA source-build support without changing the numerical engine.
+
+## Launch on macOS or Windows
+
+- **macOS (Apple Silicon or Intel):** extract the project and double-click **`start_gui.command`**. For a Terminal fallback, run `bash start_gui.sh` in the project folder. Use Python 3.12 (3.11 also supported). Dependencies are installed into a local `.venv` on first launch. The app opens at http://127.0.0.1:7860. See **`docs/MACOS_SETUP.md`**.
+- **Windows:** double-click **`start_gui.bat`** as before. The existing `.bat` launcher and GUI are unchanged.
+- **AGAMA:** optional. The Mac build script is **`bash scripts/install_agama_macos.sh`**, using Xcode Command Line Tools and Homebrew `gsl`, `eigen`, `libomp`; Windows keeps `scripts/install_agama_windows.bat`. Running the GUI does **not** require AGAMA.
+- **No cross-OS virtual environment:** if moving the project between computers, copy source and `results/`, but recreate `.venv` on each machine.
+
+**Platform testing note:** the code and source launcher checks have been tested in the Linux build environment, **not on a physical macOS machine**. AGAMA's compiled extension is still untested; an AGAMA-generated disk should not yet be called equilibrium-validated.
+
+## What's new in V1.5
+
+- **Uploaded AGAMA-master included:** `vendor/Agama-master.zip` is bundled as source for a local C++/Python build. On Windows use `scripts/install_agama_windows.bat` from a Visual Studio x64 Native Tools Command Prompt. The GUI runs without AGAMA, but DF generation explicitly requires a successful import.
+- **Revised AGAMA model adapter:** based directly on the supplied upstream `example_self_consistent_model3.py` and `reference.tex`, with correct negative `sech²` scale-height convention, larger spherical halo grid, disk-DF normalization, and model/sample mass diagnostics.
+- **Independent galaxy realizations:** new AGAMA binary encounters use one computed equilibrium model but independently sampled progenitor particle noise (`seed`, `seed+1`); cached single-galaxy snapshots remain reusable with an explicit correlated-realization warning in metadata.
+- **Generation provenance:** saves `agama_generation_report.json` with requested, initial density, DF and sampled component masses, as well as reference resolution and units.
+- **New GUI tab, Test a saved equilibrium galaxy:** evolve the exact saved initial particles with `dt` and `dt/2`, compare isolated structural/energy evolution, save trajectories and reports. This is an initial **screen**, not full validation.
+- **CLI validation:** `python -m experiments.agama_selftest` (requires actual compiled AGAMA) and `python -m experiments.validate_galaxy --snapshot <path>`.
+- **Teaching materials:** `docs/DEEP_LEARNING_GUIDE.md` provides a mathematical and conceptual introduction to each subsystem, its corresponding files, and worked examples. `docs/V15_VALIDATION_PROTOCOL.md` defines the evidence needed before physical claims.
+
+**Testing status:** 33 Python tests pass, including mock-AGAMA API tests and GUI end-to-end integration plumbing. These tests **do not** substitute for running the compiled AGAMA library. The build environment lacks the GSL development headers and an importable AGAMA extension, so AGAMA-generated live galaxies have **not** been physically validated here.
+
+### Recommended first run after AGAMA is installed
+
+```powershell
+.\.venv\Scripts\python.exe -m experiments.agama_selftest
+.\.venv\Scripts\python.exe -m experiments.validate_galaxy --snapshot results/galaxies/agama_smoke_900.npz --steps 80 --dt 0.003
+```
+
+Then use the GUI's **Test a saved equilibrium galaxy** tab and compare different softening, particle-resolution and random-seed settings before attempting the Mice reconstruction.
+
+### The learning material
+
+Start with `docs/DEEP_LEARNING_GUIDE.md`. It develops the project in the order **particle arrays → force law → leapfrog → phase-space DF → AGAMA potential iteration → sampling → isolation → spirals → Mice → solver comparisons**. The discussion is tied to the actual V1.5 source files, not a generic N-body tutorial.
 
 ## What changed in V1.4.1
 
@@ -65,7 +111,7 @@ Each GUI run creates `results/runs/<name_timestamp>/` containing:
 - `encounter_metrics.csv`, `encounter_report.json` for collision runs.
 - Optional MP4 and GIF exports.
 
-AGAMA-generated particle realizations are also cached to `results/galaxies/`; choose **Saved snapshot** to reuse one. Saved run folders are intentionally separate from the generated galaxy library. For encounters, non-preview sources currently reuse the *same sampled realization* for both progenitors (with different orientations and orbital states); this avoids rerunning a costly DF builder but creates correlated finite-N noise. The default native preview generates two different seeds.
+AGAMA-generated particle realizations are also cached to `results/galaxies/`; choose **Saved snapshot** to reuse one. Saved run folders are intentionally separate from the generated galaxy library. For newly generated AGAMA binary encounters, both progenitors are independent samples from one equilibrium model (seeds differ), without a second expensive model construction. Selecting a **single saved snapshot** as both progenitors still produces correlated finite-N noise, which is recorded in the run configuration. The native preview independently seeds two galaxies.
 
 The results are small enough for teaching experiments but can grow rapidly for high particle counts and many saved frames. Large runs should use the compiled force solvers.
 
@@ -73,7 +119,7 @@ The results are small enough for teaching experiments but can grow rapidly for h
 
 - The *native disk–bulge–halo* galaxy generator samples motivated **positions** but assigns approximate, not DF-equilibrium, velocities. It is for demos only.
 - The *Plummer* generator samples an analytic isotropic equilibrium DF, but finite-particle simulations with softened forces still need resolution and stability testing. Our short demonstration is only a screen.
-- The *AGAMA* adapter follows the official three-component self-consistent DF workflow, including component DFs, iterative potential updates, and DF particle sampling. **AGAMA is not installed here; runtime compatibility, gravity units, model masses, and isolated stability remain unverified**. We intentionally do not label those results validated.
+- The *AGAMA* adapter follows the official three-component self-consistent DF workflow, including component DFs, iterative potential updates, and DF particle sampling. **compiled AGAMA is not installed here; we have source-level and mocked-interface verification but real AGAMA model construction, masses, and isolated stability remain unverified**. We intentionally do not label those results validated.
 - The observed Mice (NGC 4676) contain gas and stellar populations absent from our collisionless model; a qualitative tidal picture cannot establish observational agreement. Actual orbital/pericenter measurements require tracking live galaxy centers, not only the nominal point-mass initialization.
 - The energy diagnostic is the total *softened* N-body energy sampled during the run (up to roughly a dozen stored frames for up to 6000 particles). Drift between sampled frames is not measured; for higher N, the expensive pairwise energy diagnostic is skipped.
 - **Do not treat the GUI's isolated screening thresholds (5% half-mass drift, 10% disk thickness drift, 1% endpoint energy) as universal scientific standards.** Longer isolation runs, several particle resolutions, multiple seeds, and comparisons against the published Mice are required.
