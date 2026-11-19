@@ -1,0 +1,7 @@
+{
+  "n": 500,
+  "direct_vs_fast_direct_max_rel": 4.4376756517750776e-16,
+  "bh_vs_fast_bh_max_rel": 2.4603260779824506e-15,
+  "barnes_hut_theta0.05_vs_direct_max_rel": 3.43408991838551e-05,
+  "fast_barnes_hut_theta0.05_vs_direct_max_rel": 3.4340899184112e-05
+}
