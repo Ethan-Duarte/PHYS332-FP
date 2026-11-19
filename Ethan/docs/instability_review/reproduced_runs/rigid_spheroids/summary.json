@@ -1,0 +1,9 @@
+{
+  "relative_changes": {
+    "height": 0.06473534702791683,
+    "sigma_z": 0.033902070478809776,
+    "r50": -0.00328067446856406
+  },
+  "duration": 0.5,
+  "caveat": "Removes both spheroid granularity and response; cannot distinguish them alone; not a merger model"
+}

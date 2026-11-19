@@ -1,0 +1,58 @@
+{
+  "candidate_halo24000.npz": {
+    "bytes": 1385946,
+    "sha256": "63ccce928640ccd4effc4c1e462b869df4bf76c2a7e9f7b9b4fb248add118307"
+  },
+  "smooth_potential.ini": {
+    "bytes": 59169,
+    "sha256": "a4a13e493ed7168f9a3dc0a47195c9e44afd3769e4d863aab30c38b53165d7b8"
+  },
+  "convergence.json": {
+    "bytes": 1400,
+    "sha256": "553414e803a53e1c5f6b99c944570a1f4423044ab7decc4cbe584ac659055684"
+  },
+  "component_noise_analysis.json": {
+    "bytes": 8526,
+    "sha256": "855f05c570ed85caf88e6e560ef5423bb62d6e011c490dc7f3a6a0e98fe45d10"
+  },
+  "force_audit_v2.json": {
+    "bytes": 37344,
+    "sha256": "2a6b31f0da36c4b11994eb75f9913544d9f80cad569ca0bf3a14088d81a3cced"
+  },
+  "mice_cached_run.py": {
+    "bytes": 8087,
+    "sha256": "7754473017f7377a42bc84c82e32f7a299a1b55e0283d6ffe53c47edc2e56b97"
+  },
+  "smooth_metrics.csv": {
+    "bytes": 1193,
+    "sha256": "6ad1aadda2f0a02b7d97aa3239535f8154e9b53f0f2693b8af8e8dea3a8525ea"
+  },
+  "smooth_control_summary.json": {
+    "bytes": 244,
+    "sha256": "857513a60fdab97526ada733dcc19b36900f666c761eda3ba433bb8f1d19dcaa"
+  },
+  "candidate_halo6000.npz": {
+    "bytes": 555631,
+    "sha256": "2cae294d5fc569ccd0074e72b193a23caf2090fa304560b2e6bbe9cbdd4fe151"
+  },
+  "agama_control.py": {
+    "bytes": 9207,
+    "sha256": "efd7fd8dd43455b79cd4a103a32e832cac1e7fa356545294240bc2f923f9e46c"
+  },
+  "solver_timings.json": {
+    "bytes": 977,
+    "sha256": "3019b1b9babf1e6e5735cadea3309ea75e0ef3e52274d8148d1f5983b4bb861f"
+  },
+  "live_halo24000/force_check.json": {
+    "bytes": 171,
+    "sha256": "b5f515a554092081ad65765bd5926c303152b5040c7b90e20c1839c16472656d"
+  },
+  "live_halo6000/live_summary.json": {
+    "bytes": 2717,
+    "sha256": "84187b4e7f2b2d2164998433f5528ffd1fb519f3c3b0bf95611170d35abed01b"
+  },
+  "live_halo6000/force_check.json": {
+    "bytes": 172,
+    "sha256": "bd3580be41da50b967cb7b17374e2503ff9233443efdfba035a4b3eef3a38b55"
+  }
+}

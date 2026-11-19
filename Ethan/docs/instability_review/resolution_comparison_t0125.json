@@ -1,0 +1,20 @@
+{
+  "baseline": {
+    "duration": 0.125,
+    "height_change": 0.12041297027350684,
+    "sigma_z_change": 0.06588769088757185,
+    "r50_change": 0.024935126442961364
+  },
+  "disk_4x": {
+    "duration": 0.125,
+    "height_change": 0.10502369284167767,
+    "sigma_z_change": 0.05516474321864129,
+    "r50_change": 0.003700746739603744
+  },
+  "halo_4x": {
+    "duration": 0.125,
+    "height_change": 0.06490108645249215,
+    "sigma_z_change": 0.047534942008047754,
+    "r50_change": 0.004281177506875178
+  }
+}

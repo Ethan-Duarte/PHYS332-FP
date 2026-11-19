@@ -1,0 +1,26 @@
+{
+  "smooth": {
+    "relative_changes": {
+      "r50": -0.006995280895774725,
+      "height": -0.005253274841835465,
+      "sigma_z": 0.0012069627321633636
+    },
+    "duration": 0.125,
+    "steps": 128,
+    "dt": 0.0009765625,
+    "wall_seconds": 5.867666704000385
+  },
+  "live": {
+    "relative_changes": {
+      "r50": 0.003700746739603744,
+      "height": 0.10502369284167767,
+      "sigma_z": 0.05516474321864129
+    },
+    "duration": 0.125,
+    "steps": 128,
+    "dt": 0.0009765625,
+    "wall_seconds": 182.7615866049996,
+    "relative_energy_change": 2.2268400576406533e-06
+  },
+  "status": "Diagnostic screening only; no automatic stability verdict"
+}
