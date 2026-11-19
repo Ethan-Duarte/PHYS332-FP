@@ -1,0 +1,59 @@
+{
+  "config": {
+    "package": "Henry",
+    "out": "Henry/results",
+    "seed": 42,
+    "eps": 0.05,
+    "G": 1.0,
+    "thetas": [
+      0.3,
+      0.5,
+      0.7,
+      1.0
+    ],
+    "theta_default": 0.5,
+    "n_force": 2000,
+    "n_sweep": [
+      2000,
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+    ],
+    "repeats": 5,
+    "solvers": [
+      "fast_direct",
+      "fast_barnes_hut"
+    ],
+    "max_n": {
+      "direct": 6000,
+      "fast_direct": 100000,
+      "barnes_hut": 4000,
+      "fast_barnes_hut": 100000
+    },
+    "n_cons": 500,
+    "dt": 0.01,
+    "steps": 300,
+    "diag_every": 10
+  },
+  "solvers": [
+    "fast_direct",
+    "fast_barnes_hut"
+  ],
+  "machine": {
+    "python": "3.12.4",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 8,
+    "numpy": "1.26.4",
+    "env_threads": {
+      "NUMBA_NUM_THREADS": null,
+      "OMP_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null,
+      "OPENBLAS_NUM_THREADS": null
+    },
+    "numba": "0.59.1",
+    "numba_threads": 8
+  }
+}
