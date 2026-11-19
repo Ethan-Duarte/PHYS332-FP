@@ -36,14 +36,24 @@ def structure(p):
     disk = p.component == 0
     if np.any(disk):
         x, v, m = p.x[disk], p.v[disk], p.m[disk]
-        # Isolated disk aligned with xy plane; recenter on disk centroid.
+        # Remove the fitted disk plane: a rigid tilt is not disk heating.
         cm = np.average(x, axis=0, weights=m)
         vm = np.average(v, axis=0, weights=m)
         x, v = x-cm, v-vm
-        R = np.linalg.norm(x[:, :2], axis=1)
-        vr = (x[:, 0]*v[:, 0]+x[:, 1]*v[:, 1])/np.maximum(R,1e-12)
+        covariance = (x*m[:,None]).T@x/m.sum()
+        values, axes = np.linalg.eigh(covariance)
+        normal = axes[:,0]
+        z = x@normal
+        radial = x-z[:,None]*normal
+        R = np.linalg.norm(radial, axis=1)
+        vr = np.sum(radial*v,axis=1)/np.maximum(R,1e-12)
+        vz = v@normal
         return dict(r50=weighted_half_radius(R,m),
-                    z_rms=float(np.sqrt(np.average(x[:, 2]**2, weights=m))),
+                    r90=float(np.quantile(R,.9)),
+                    z_rms=float(np.sqrt(max(values[0],0))),
+                    z_rms_fixed_axis=float(np.sqrt(np.average(x[:,2]**2,weights=m))),
+                    sigma_z=float(np.sqrt(np.average(vz*vz,weights=m))),
+                    tilt_degrees=float(np.degrees(np.arccos(np.clip(abs(normal[2]),0,1)))),
                     sigma_R=float(np.sqrt(np.average((vr-np.average(vr,weights=m))**2, weights=m))))
     cm = np.average(p.x, axis=0, weights=p.m)
     r = np.linalg.norm(p.x-cm, axis=1)
@@ -72,7 +82,7 @@ def inspect_isolation(snapshots, eps, folder, backend='preview'):
                   max_abs_energy_drift=max_energy_drift,
                   thresholds=dict(r50=.05, z_rms=.10, energy=.01),
                   n_particles=len(snapshots[0][1].m), duration=float(end['time']))
-    keys=['time','r50','z_rms','sigma_R','energy']
+    keys=['time','r50','r90','z_rms','z_rms_fixed_axis','sigma_z','sigma_R','tilt_degrees','energy']
     with (folder/'isolation_metrics.csv').open('w',newline='') as f:
         w=csv.DictWriter(f,fieldnames=keys,extrasaction='ignore');w.writeheader();w.writerows(samples)
     (folder/'isolation_report.json').write_text(json.dumps(report,indent=2))

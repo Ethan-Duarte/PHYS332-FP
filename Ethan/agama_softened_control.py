@@ -327,6 +327,8 @@ def main():
         "convergence": history,
         "status": "softening-compatible candidate; live stability remains unverified",
         "epsilon": args.epsilon,
+        "construction_force_model": {"kernel":"plummer","epsilon":args.epsilon,"G":1.},
+        "equilibrium_status": "unvalidated",
         "scm_interpolated_actions": args.interpolated_actions,
         "density_closure_max_errors": exact_density_errors,
         "quadrature_order": list(quad_order),

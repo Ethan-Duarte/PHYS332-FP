@@ -86,6 +86,7 @@ def generate(config, with_report=False, realizations=1):
         source='AGAMA-master/py/example_self_consistent_model3.py',
         status='DF candidate: isolated evolution and convergence NOT YET VALIDATED',
         units='dimensionless, G=1', seed=seed, Q_target_at_Rd=Q,
+        construction_force_model=dict(kernel='newtonian',G=1.),
         kappa_at_Rd=kappa, sigmaR_target_at_Rd=float(sigmaR_rd),
         model_radius_max=float(rmax), iterations=len(history),
         requested_masses=[float(d['mass']), float(b['mass']), float(h['mass'])],

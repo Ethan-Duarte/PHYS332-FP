@@ -1,4 +1,4 @@
-"""Run cached AGAMA galaxies without importing AGAMA.
+"""Run stored galaxy candidates without importing their original generator.
 
 Place this file in PHYS332-FP/Ethan.
 Use --a and --b to supply corrected snapshots. This is an exploratory setup.
@@ -51,7 +51,6 @@ def main():
 
     root = Path(__file__).resolve().parent
     out = args.out if args.out.is_absolute() else root / args.out
-    out.mkdir(parents=True, exist_ok=False)
     sources = []
 
     def read_galaxy(path):
@@ -71,10 +70,12 @@ def main():
 
         expected = metadata.get('epsilon')
         if expected is None:
-            raise ValueError('Use a corrected candidate with explicit epsilon metadata')
+            raise ValueError('Snapshot has no declared epsilon. Use a force-documented candidate; adding a number alone does not correct its equilibrium.')
         if args.eps is None: args.eps = float(expected)
         if not np.isclose(args.eps,float(expected),rtol=0,atol=1e-15):
             raise ValueError('Encounter epsilon must match BOTH candidate equilibria')
+        from nbody.galaxies.provenance import check_evolution_softening
+        compatibility = check_evolution_softening(metadata,args.eps)
         disk = particles.component == 0
         if not disk.any():
             raise ValueError(f"No stellar disk particles in {path}")
@@ -92,6 +93,7 @@ def main():
             "file": str(path.resolve()),
             "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "metadata": metadata,
+            "force_compatibility": compatibility,
             "removed_disk_position": origin.tolist(),
             "removed_disk_velocity": bulk_velocity.tolist(),
         })
@@ -107,6 +109,9 @@ def main():
     galaxy_a = read_galaxy(args.a)
 
     galaxy_b = read_galaxy(args.b)
+    # Validate inputs before creating the output directory. Failed imports must
+    # not reserve a run name and cause a second FileExistsError on retry.
+    out.mkdir(parents=True, exist_ok=False)
 
     # The initial separation points along +x. Calculate the
     # point-mass reference pericenter direction, then express
@@ -146,7 +151,7 @@ def main():
 
     metadata = {
         "setup": "Mice encounter",
-        "backend": "stored AGAMA candidate",
+        "backend": "stored galaxy candidate",
         "model": "Disk\u2013bulge\u2013halo",
         "config": sources[0]["metadata"].get("config"),
         "sources": sources,

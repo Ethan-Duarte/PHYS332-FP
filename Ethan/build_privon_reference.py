@@ -1,14 +1,24 @@
 import math
+import argparse
+import hashlib
+import json
 import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
 
-root = Path.home() / "nbody-tools/zeno-reference"
-out = root / (
-    "privon-build-" + datetime.now().strftime("%Y%m%d-%H%M%S")
-)
-out.mkdir()
+parser = argparse.ArgumentParser(description='Reference-style Zeno candidate; approximate sheet velocities, not certified equilibrium')
+parser.add_argument('--root',type=Path,default=Path(os.environ.get('ZENO_REFERENCE',str(Path.home()/'nbody-tools/zeno-reference'))))
+parser.add_argument('--disk',type=int,default=24576)
+parser.add_argument('--bulge',type=int,default=8192)
+parser.add_argument('--halo',type=int,default=32768)
+parser.add_argument('--seed',type=int,default=42)
+parser.add_argument('--out',type=Path)
+args=parser.parse_args()
+if min(args.disk,args.bulge,args.halo)<1:parser.error('All component counts must be positive')
+root = args.root.resolve()
+out = args.out or root / ('privon-build-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f'))
+out.mkdir(parents=True,exist_ok=False)
 
 env = dict(os.environ, ZENOPATH=str(root))
 log = out / "generation.log"
@@ -147,10 +157,11 @@ run(
     "eps=.0115", "kappa=2.025",
 )
 
-# First generator check: quarter of the paper's follow-up count.
+# Counts are explicit; the former 16,384-particle pilot remains reproducible
+# with --disk 6144 --bulge 2048 --halo 8192.
 for component, count, seed in [
-    ("bulge", 2048, 42),
-    ("halo", 8192, 43),
+    ("bulge", args.bulge, args.seed),
+    ("halo", args.halo, args.seed+1),
 ]:
     run(
         "gsprealize",
@@ -167,8 +178,23 @@ run(
     "mdisk=.1875", "alpha=12", "zdisk=.0075",
     "epsilon=.010606601717798213",
     "mu=2", "r_mu=.075", "eta=.25",
-    "rcut=1", "ndisk=6144", "seed=44",
+    "rcut=1", f"ndisk={args.disk}", f"seed={args.seed+2}",
 )
+
+revision = subprocess.run(['git','-C',str(root),'rev-parse','HEAD'],capture_output=True,text=True)
+manifest = dict(
+    backend='Zeno reference-style generator',source_commit=revision.stdout.strip() if revision.returncode==0 else None,
+    source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
+    patched_disk_source_sha256=hashlib.sha256(patched.read_bytes()).hexdigest(),
+    particles=dict(disk=args.disk,bulge=args.bulge,halo=args.halo),
+    seeds=dict(disk=args.seed+2,bulge=args.seed,halo=args.seed+1),
+    evolution_force_model=dict(kernel='plummer',epsilon=.0075,G=1.),
+    construction=dict(spheroid_smoothed_profile_epsilon=.0115,
+        disk_radial_effective_epsilon=.010606601717798213,
+        vertical_velocity_model='approximate isothermal sheet; not matched to the full softened vertical field'),
+    equilibrium_status='unvalidated',
+    notes='Reference reconstruction with documented patch; source papers do not certify this realization.')
+(out/'model_manifest.json').write_text(json.dumps(manifest,indent=2))
 
 print("\nGenerated components:", out)
 print("Generation log:", log)

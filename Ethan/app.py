@@ -254,6 +254,7 @@ def simulate(*values, progress=gr.Progress()):
         backend=p['generator']
         saved_config=None
         generation_report=None
+        force_compatibility=None
         extra_galaxy=None
         yield _status('Constructing initial conditions… AGAMA self-consistency can take substantial time; cancel is checked after its compiled computation returns.')
         if p['model']=='Plummer (analytic DF)':
@@ -266,6 +267,8 @@ def simulate(*values, progress=gr.Progress()):
             if backend=='Saved snapshot':
                 if not p['snapshot']: raise gr.Error('Choose a saved particle snapshot first.')
                 g1, source=load(GALAXIES/Path(p['snapshot']).name)
+                from nbody.galaxies.provenance import check_evolution_softening
+                force_compatibility=check_evolution_softening(source,float(p['eps']))
                 backend='saved: '+source.get('backend','unknown')
                 saved_config=source.get('config')
             else:
@@ -274,6 +277,7 @@ def simulate(*values, progress=gr.Progress()):
                 if backend=='agama' and not agama_status()['available']:
                     raise gr.Error('AGAMA is not importable in the GUI Python environment. See the AGAMA status above.')
                 if backend=='agama':
+                    force_compatibility='Newtonian AGAMA construction; Plummer evolution requires a separate compatibility/isolation check.'
                     from nbody.galaxies.sources.agama import generate as generate_agama
                     candidates, generation_report = generate_agama(
                         config, with_report=True, realizations=1 if isolated else 2)
@@ -283,9 +287,11 @@ def simulate(*values, progress=gr.Progress()):
                         g1, extra_galaxy = candidates
                     filename=f'agama_{datetime.now():%Y%m%d_%H%M%S}'
                     save(GALAXIES/f'{filename}_A.npz',g1,dict(backend='agama',config=config,
+                         construction_force_model={'kernel':'newtonian','G':1.},
                          generation_report=generation_report, validation='candidate; untested isolation'))
                     if extra_galaxy is not None:
                         save(GALAXIES/f'{filename}_B.npz',extra_galaxy,dict(backend='agama',config={**config,'seed':config['seed']+1},
+                             construction_force_model={'kernel':'newtonian','G':1.},
                              generation_report=generation_report, validation='candidate; untested isolation'))
                 else:
                     g1=galaxy(config,backend)
@@ -309,6 +315,8 @@ def simulate(*values, progress=gr.Progress()):
         steps,save_every=int(p['steps']),int(p['save_every'])
         progress(0,desc='Integrating gravitational forces')
         yield _status(f'Integrating **{p["setup"]}** · {len(initial.m):,} particles · **{p["solver"]}**…')
+        if force_compatibility:
+            yield _status(force_compatibility)
         try:
             for time,particles in evolve(initial,force,float(p['dt']),steps,save_every,cancelled=CANCEL):
                 snapshots.append((time,particles))
@@ -325,6 +333,7 @@ def simulate(*values, progress=gr.Progress()):
                       solver=p['solver'],eps=float(p['eps']),theta=float(p['theta']),
                       dt=float(p['dt']),steps=steps,save_every=save_every,
                       cancelled=CANCEL.is_set(), generation_report=generation_report,
+                      force_compatibility=force_compatibility,
                       correlated_realizations=(not isolated and g2 is g1),
                       caveat='Native preview is NOT equilibrium; AGAMA output requires isolated validation')
         trajectory=folder/'run_trajectory.npz'
