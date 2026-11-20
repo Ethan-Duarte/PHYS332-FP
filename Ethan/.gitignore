@@ -1,8 +1,21 @@
+# Local environments and generated Python/Numba caches
+.venv/
+.venv-*/
+venv/
 __pycache__/
 .pytest_cache/
-.venv/
-*.pyc
-.venv/
-results/
-results/runs/
+*.py[cod]
+*.nbc
+*.nbi
 
+# Local simulations, exports and installer builds
+/results/
+/vendor/agama-local-build/
+/vendor/agama-build*/
+startup_error.log
+*.log
+
+# OS/editor leftovers
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/

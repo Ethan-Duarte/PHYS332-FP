@@ -63,7 +63,7 @@ Run the correction and both smooth-field timestep checks. The input is the
 original full-resolution initial.txt in WSL; the output folder must be new:
 
 ```powershell
-.\.venv\Scripts\python.exe .\zeno_smooth_control.py `
+.\.venv\Scripts\python.exe .\tools\zeno_smooth_control.py `
   --initial "\\wsl.localhost\Ubuntu\home\whisky\nbody-tools\zeno-reference\full-resolution-20261119-032100\initial.txt" `
   --vertical-jeans `
   --out results\reference_jeans_candidate
@@ -81,7 +81,7 @@ locally before evolution; increasing to 768 steps matches t=1.5 at dt=1/512.
 Do not compare the short screen's endpoint directly with the long live run.
 
 ```powershell
-.\.venv\Scripts\python.exe .\reference_live_control.py `
+.\.venv\Scripts\python.exe .\tools\reference_live_control.py `
   results\reference_jeans_candidate\jeans_candidate.npz `
   results\reference_jeans_candidate\smooth_spheroid_field.npz `
   --solver direct --threads 4 --steps 64 `

@@ -3,7 +3,7 @@ import pytest
 from nbody.particles import Particles
 from nbody.diagnostics import structure
 from nbody.galaxies.provenance import check_evolution_softening
-from zeno_smooth_control import vertical_jeans_variance
+from tools.zeno_smooth_control import vertical_jeans_variance
 
 
 def test_measured_thickness_is_invariant_under_rigid_tilt():

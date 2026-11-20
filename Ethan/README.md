@@ -1,49 +1,50 @@
-# Final planned isolated stellar-resolution comparison
+# N-Baddies: N-body galaxy simulations
 
-Extract the files directly into your existing `Ethan` directory, alongside `zeno_mice_run.py`, `zeno_snapshot_bridge.c` and the `nbody` package. Replace the two supplied helper scripts if asked. Do not run the preparation audit script: the initial state is already supplied.
+Direct and Barnes–Hut gravity, galaxy construction, isolated controls and exploratory Mice encounters. The current priority is presentation plots and animations; the planned isolated validation sequence is complete for now.
 
-From PowerShell in Ethan:
+## Start here
+
+- **Open the GUI:** double-click `start_gui.bat` on Windows, or run `bash start_gui.sh` on macOS/Linux.
+- **Current model and limitations:** [docs/CURRENT_MODEL.md](docs/CURRENT_MODEL.md).
+- **CLI commands and tool index:** [docs/WORKFLOW.md](docs/WORKFLOW.md). Run commands from this `Ethan` directory.
+- **Sources:** [docs/BIBLIOGRAPHY.md](docs/BIBLIOGRAPHY.md).
+- **Cleanup details:** [docs/CLEANUP.md](docs/CLEANUP.md).
+
+## Folder guide
+
+| Folder | Contents |
+|---|---|
+| `nbody/` | Gravity solvers, integrator, galaxy models, diagnostics and rendering |
+| `tools/` | Command-line generation, analysis, reference and encounter tools |
+| `experiments/` | Existing module-based demonstrations and benchmark studies |
+| `validation_suite/` | Reusable measurements and reference reports |
+| `assets/initial_conditions/` | Prepared final and halo-refined states, with provenance |
+| `assets/reference/` | Original reference particle export |
+| `assets/galaxies/legacy_agama/` | Earlier cached candidates for reproducibility, not the selected model |
+| `presets/` | Model configurations |
+| `results/` | Your local trajectories, generated galaxies, plots and exports; ignored by Git |
+| `docs/` | Guides, scientific notes, bibliography and historical checkpoint instructions |
+| `scripts/` | AGAMA installation helpers |
+| `tests/` | Software regression checks |
+| `vendor/` | Supplied AGAMA source archive; generated local builds remain local |
+
+## Environments
+
+Keep using the existing `.venv` in this directory. The cleanup does not require rebuilding AGAMA. For a fresh environment:
 
 ```powershell
-$finalOut = "results\final_stellar_resolution_" + (Get-Date -Format "yyyyMMdd_HHmmss")
-
-.\.venv\Scripts\python.exe .\run_final_stellar_test.py `
-  --out $finalOut
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-science.txt
 ```
 
-The driver checks the prepared state, runs one isolated Zeno simulation, analyzes the saved trajectory, then creates `analysis_to_share.zip` inside the run folder. Send that ZIP. The full trajectory stays available in the same folder for rendering. No second simulation is launched by the analysis step.
+The GUI launcher installs its GUI requirements if missing. AGAMA is optional for generators that need it; replay and Zeno reference tools do not require importing AGAMA. Existing WSL Zeno/GADGET installations are separate and are not moved.
 
-## Fixed experimental settings
+## Tests
 
-| Quantity | Choice | Purpose |
-|---|---|---|
-| Disk particles | 12,288 | Four times the previous sampling at fixed disk mass |
-| Bulge particles | 4,096 | Four times the previous sampling at fixed bulge mass |
-| Halo particles | 32,768 | Exact previous halo particles, velocities and masses retained before common recentering |
-| Total particles | 49,152 | Targeted stellar refinement rather than increasing all components |
-| Component masses | 0.1875, 0.0625, 1.0000047683731454 | Unchanged |
-| Plummer epsilon | 0.009375 | Same construction/evolution setting as the baseline |
-| Timestep | 1/512 = 0.001953125 | Same timestep; halving it previously did not cure growth |
-| Tree theta | 0.7 | Same criterion; prior direct/tree structural comparison agreed closely |
-| Quadrupoles | On | Same solver settings |
-| Duration | 1.25 code units, 640 steps | Same endpoint as the completed baseline, including late mode growth |
-| Saved interval | Every 8 steps, 81 scheduled frames including t=0 | Same cadence, with positions and velocities for analysis and later rendering |
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest tests -q
+.\.venv\Scripts\python.exe -m unittest discover -s validation_suite/tests -q
+```
 
-The prepared state retains the original 3,072 disk and 1,024 bulge coordinates and velocities, and adds distinct particles from the verified same parent realization. Stellar particle masses decrease fourfold; they are not cloned particles. All component masses are preserved. Sampling uses a recorded fixed seed. The runner subtracts a common overall center and bulk velocity, which preserves internal distances and relative velocities.
-
-This is one joint disk/bulge sampling comparison, not separate identification of their individual contributions or a seed ensemble. It can show whether the measured structural growth is sensitive to stellar sampling. A quieter result does not by itself prove an exact equilibrium distribution function.
-
-No velocity damping, Q changes, force-kernel changes or new softening are introduced. Prograde versus retrograde orientation has no orbital meaning for this isolated test; encounter spin correction will be applied when constructing the animation's collision setup.
-
-## What was checked before delivery
-
-- Parent candidate identity and unique matching of retained stars to the parent realization.
-- Exact halo-state retention before common recentering.
-- Component total masses and distinct added parent IDs.
-- Initial-state checksum, particle counts and finite coordinates/velocities.
-- Driver preflight and Python compilation. The long final run was not executed here.
-- The analysis helper was previously tested against the original isolation diagnostics and synthetic bending fields.
-
-`prepare_final_stellar_control.py` and `final_stellar_initial.preparation.json` preserve the preparation procedure and source hashes for auditing. You do not need the large parent trajectory to run the supplied prepared NPZ.
-
-After this comparison we move to animation development. Its measured limitations will be recorded rather than triggering an automatic sequence of more validation simulations.
+The core solvers and physical parameters were not changed by the cleanup. Software tests do not certify a stationary galaxy or an observational fit.
