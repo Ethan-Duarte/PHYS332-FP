@@ -1,0 +1,23 @@
+test_bad_initial_match_is_rejected (test_validation.ValidationTests.test_bad_initial_match_is_rejected) ... ok
+test_batch_uses_manifest_relative_paths (test_validation.ValidationTests.test_batch_uses_manifest_relative_paths) ... ok
+test_changed_epsilon_not_called_convergence (test_validation.ValidationTests.test_changed_epsilon_not_called_convergence) ... ok
+test_existing_output_never_modified (test_validation.ValidationTests.test_existing_output_never_modified) ... ok
+test_force_has_no_self_term_and_correct_mass_sign (test_validation.ValidationTests.test_force_has_no_self_term_and_correct_mass_sign) ... ok
+test_force_law_mismatch_is_rejected (test_validation.ValidationTests.test_force_law_mismatch_is_rejected) ... ok
+test_forged_acceleration_provenance_rejected (test_validation.ValidationTests.test_forged_acceleration_provenance_rejected) ... ok
+test_inspect_does_not_certify_missing_evidence (test_validation.ValidationTests.test_inspect_does_not_certify_missing_evidence) ... ok
+test_nonfinite_and_bad_time_rejected (test_validation.ValidationTests.test_nonfinite_and_bad_time_rejected) ... ok
+test_observation_table_no_data_rejected (test_validation.ValidationTests.test_observation_table_no_data_rejected) ... ok
+test_reviewed_policy_failure_returns_nonzero (test_validation.ValidationTests.test_reviewed_policy_failure_returns_nonzero) ... ok
+test_rigid_tilt_does_not_become_heating (test_validation.ValidationTests.test_rigid_tilt_does_not_become_heating) ... ok
+test_shared_times_and_halfstep_input_accepted (test_validation.ValidationTests.test_shared_times_and_halfstep_input_accepted) ... ok
+test_synthetic_velocity_holdout_and_fit_kept_separate (test_validation.ValidationTests.test_synthetic_velocity_holdout_and_fit_kept_separate) ... ok
+test_target_profiles_are_hashed_and_do_not_certify_equilibrium (test_validation.ValidationTests.test_target_profiles_are_hashed_and_do_not_certify_equilibrium) ... ok
+test_unknown_external_dynamics_cannot_get_pair_energy_verdict (test_validation.ValidationTests.test_unknown_external_dynamics_cannot_get_pair_energy_verdict) ... ok
+test_unknown_force_law_not_silently_assumed (test_validation.ValidationTests.test_unknown_force_law_not_silently_assumed) ... ok
+test_unreviewed_policy_is_not_a_pass (test_validation.ValidationTests.test_unreviewed_policy_is_not_a_pass) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 6.938s
+
+OK

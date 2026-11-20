@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "regression_tests_passed": 18,
+  "native_solver_selftest": "passed: actual project direct force and leapfrog vs independent force / DOP853 orbit",
+  "native_direct_control_smoke": "8192 particles, eight steps completed; not a stability test",
+  "native_tree_adapter_smoke": "synthetic 32-particle adapter run completed; not galaxy validation",
+  "data_reports": "Selected encounter, existing isolation history, matched timestep comparison, initial masses and force samples",
+  "scope": "Collisionless self-gravity, inertial coordinates, fixed masses, Plummer kernel",
+  "limitations": [
+    "No invented observational data or physical calibration",
+    "No automatic global physical validation verdict",
+    "Physical tolerance policy is illustrative and inactive by default",
+    "External engines require actual same-frame acceleration exports for their force test"
+  ]
+}

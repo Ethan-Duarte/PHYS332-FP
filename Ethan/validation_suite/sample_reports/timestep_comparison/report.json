@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "command": "compare",
+  "inputs": [
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/mice_selected_isolation_v2/run_trajectory.npz",
+      "sha256": "bdb71b76c3f7a9d588f461e22c2e33f49b5f67cabfc9b94abd3ca9c79a114e91"
+    },
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/mice_selected_isolation_halfdt/run_trajectory.npz",
+      "sha256": "3b6e9fcf30cdd48a363f0f7391ef53df75b3a0d6a1b6c4ede31bc1e6c337c611"
+    }
+  ],
+  "status": "MEASURED",
+  "checks": [
+    {
+      "name": "Compatible controlled inputs",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "name": "Common saved times",
+      "status": "PASS",
+      "value": 35
+    },
+    {
+      "name": "A2 agreement",
+      "status": "MEASURED",
+      "value": 0.011840770188909519,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "height agreement",
+      "status": "MEASURED",
+      "value": 0.0001550519188152092,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "r50 agreement",
+      "status": "MEASURED",
+      "value": 0.00033639264883712213,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "r90 agreement",
+      "status": "MEASURED",
+      "value": 9.02254491469241e-05,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "sigma_R agreement",
+      "status": "MEASURED",
+      "value": 0.0005803212883502509,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "sigma_z agreement",
+      "status": "MEASURED",
+      "value": 0.00048747056901544375,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    }
+  ],
+  "measurements": {
+    "kind": "timestep",
+    "metrics": [
+      {
+        "metric": "A2",
+        "max_relative_difference": 0.011840770188909519
+      },
+      {
+        "metric": "height",
+        "max_relative_difference": 0.0001550519188152092
+      },
+      {
+        "metric": "r50",
+        "max_relative_difference": 0.00033639264883712213
+      },
+      {
+        "metric": "r90",
+        "max_relative_difference": 9.02254491469241e-05
+      },
+      {
+        "metric": "sigma_R",
+        "max_relative_difference": 0.0005803212883502509
+      },
+      {
+        "metric": "sigma_z",
+        "max_relative_difference": 0.00048747056901544375
+      }
+    ],
+    "common_time_start": 0.0,
+    "common_time_end": 0.53125
+  },
+  "notes": [
+    "Only common saved times are compared; no interpolation or time stretching.",
+    "Agreement concerns ensemble structures/orbit, not indefinite particle-by-particle equality.",
+    "A single resolution or seed comparison does not establish a convergence rate."
+  ],
+  "policy": {},
+  "claim": "No automatic certification of physical or observational validity. Passing applies only to named tests and declared tolerances."
+}

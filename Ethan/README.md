@@ -1,141 +1,49 @@
-# N-Baddies V1.6 — initial-condition comparison
+# Final planned isolated stellar-resolution comparison
 
-**New:** GUI tab **Virialize & relax galaxies**, global virial diagnostics using the softened force, two-stage isolated relaxation/restart, and the Windows PowerShell AGAMA build helper.
+Extract the files directly into your existing `Ethan` directory, alongside `zeno_mice_run.py`, `zeno_snapshot_bridge.c` and the `nbody` package. Replace the two supplied helper scripts if asked. Do not run the preparation audit script: the initial state is already supplied.
 
-- [V1.6 scientific workflow and equations](docs/V16_INITIAL_CONDITIONS.md)
-- [Exact Windows PowerShell AGAMA installation commands](docs/WINDOWS_AGAMA_POWERSHELL.md)
-- Optional demonstration: `python -m experiments.initial_condition_study`
-
-**Scientific boundary:** neither velocity rescaling nor unconstrained relaxation implies a self-consistent equilibrium galaxy. AGAMA's real C++ extension must still be installed and run, followed by isolation and convergence tests. The upstream source remains in `vendor/Agama-master.zip`.
-
----
-
-# N-Baddies V1.5.1 — Windows + macOS Support
-
-A student-built gravitational N-body simulator with a local browser GUI, controllable 3D playback, isolated-galaxy diagnostic experiments, a Barnes-inspired Mice encounter, and direct-versus-Barnes–Hut trajectory comparisons. V1.5.1 adds macOS launch and AGAMA source-build support without changing the numerical engine.
-
-## Launch on macOS or Windows
-
-- **macOS (Apple Silicon or Intel):** extract the project and double-click **`start_gui.command`**. For a Terminal fallback, run `bash start_gui.sh` in the project folder. Use Python 3.12 (3.11 also supported). Dependencies are installed into a local `.venv` on first launch. The app opens at http://127.0.0.1:7860. See **`docs/MACOS_SETUP.md`**.
-- **Windows:** double-click **`start_gui.bat`** as before. The existing `.bat` launcher and GUI are unchanged.
-- **AGAMA:** optional. The Mac build script is **`bash scripts/install_agama_macos.sh`**, using Xcode Command Line Tools and Homebrew `gsl`, `eigen`, `libomp`; Windows keeps `scripts/install_agama_windows.bat`. Running the GUI does **not** require AGAMA.
-- **No cross-OS virtual environment:** if moving the project between computers, copy source and `results/`, but recreate `.venv` on each machine.
-
-**Platform testing note:** the code and source launcher checks have been tested in the Linux build environment, **not on a physical macOS machine**. AGAMA's compiled extension is still untested; an AGAMA-generated disk should not yet be called equilibrium-validated.
-
-## What's new in V1.5
-
-- **Uploaded AGAMA-master included:** `vendor/Agama-master.zip` is bundled as source for a local C++/Python build. On Windows use `scripts/install_agama_windows.bat` from a Visual Studio x64 Native Tools Command Prompt. The GUI runs without AGAMA, but DF generation explicitly requires a successful import.
-- **Revised AGAMA model adapter:** based directly on the supplied upstream `example_self_consistent_model3.py` and `reference.tex`, with correct negative `sech²` scale-height convention, larger spherical halo grid, disk-DF normalization, and model/sample mass diagnostics.
-- **Independent galaxy realizations:** new AGAMA binary encounters use one computed equilibrium model but independently sampled progenitor particle noise (`seed`, `seed+1`); cached single-galaxy snapshots remain reusable with an explicit correlated-realization warning in metadata.
-- **Generation provenance:** saves `agama_generation_report.json` with requested, initial density, DF and sampled component masses, as well as reference resolution and units.
-- **New GUI tab, Test a saved equilibrium galaxy:** evolve the exact saved initial particles with `dt` and `dt/2`, compare isolated structural/energy evolution, save trajectories and reports. This is an initial **screen**, not full validation.
-- **CLI validation:** `python -m experiments.agama_selftest` (requires actual compiled AGAMA) and `python -m experiments.validate_galaxy --snapshot <path>`.
-- **Teaching materials:** `docs/DEEP_LEARNING_GUIDE.md` provides a mathematical and conceptual introduction to each subsystem, its corresponding files, and worked examples. `docs/V15_VALIDATION_PROTOCOL.md` defines the evidence needed before physical claims.
-
-**Testing status:** 33 Python tests pass, including mock-AGAMA API tests and GUI end-to-end integration plumbing. These tests **do not** substitute for running the compiled AGAMA library. The build environment lacks the GSL development headers and an importable AGAMA extension, so AGAMA-generated live galaxies have **not** been physically validated here.
-
-### Recommended first run after AGAMA is installed
+From PowerShell in Ethan:
 
 ```powershell
-.\.venv\Scripts\python.exe -m experiments.agama_selftest
-.\.venv\Scripts\python.exe -m experiments.validate_galaxy --snapshot results/galaxies/agama_smoke_900.npz --steps 80 --dt 0.003
+$finalOut = "results\final_stellar_resolution_" + (Get-Date -Format "yyyyMMdd_HHmmss")
+
+.\.venv\Scripts\python.exe .\run_final_stellar_test.py `
+  --out $finalOut
 ```
 
-Then use the GUI's **Test a saved equilibrium galaxy** tab and compare different softening, particle-resolution and random-seed settings before attempting the Mice reconstruction.
+The driver checks the prepared state, runs one isolated Zeno simulation, analyzes the saved trajectory, then creates `analysis_to_share.zip` inside the run folder. Send that ZIP. The full trajectory stays available in the same folder for rendering. No second simulation is launched by the analysis step.
 
-### The learning material
+## Fixed experimental settings
 
-Start with `docs/DEEP_LEARNING_GUIDE.md`. It develops the project in the order **particle arrays → force law → leapfrog → phase-space DF → AGAMA potential iteration → sampling → isolation → spirals → Mice → solver comparisons**. The discussion is tied to the actual V1.5 source files, not a generic N-body tutorial.
+| Quantity | Choice | Purpose |
+|---|---|---|
+| Disk particles | 12,288 | Four times the previous sampling at fixed disk mass |
+| Bulge particles | 4,096 | Four times the previous sampling at fixed bulge mass |
+| Halo particles | 32,768 | Exact previous halo particles, velocities and masses retained before common recentering |
+| Total particles | 49,152 | Targeted stellar refinement rather than increasing all components |
+| Component masses | 0.1875, 0.0625, 1.0000047683731454 | Unchanged |
+| Plummer epsilon | 0.009375 | Same construction/evolution setting as the baseline |
+| Timestep | 1/512 = 0.001953125 | Same timestep; halving it previously did not cure growth |
+| Tree theta | 0.7 | Same criterion; prior direct/tree structural comparison agreed closely |
+| Quadrupoles | On | Same solver settings |
+| Duration | 1.25 code units, 640 steps | Same endpoint as the completed baseline, including late mode growth |
+| Saved interval | Every 8 steps, 81 scheduled frames including t=0 | Same cadence, with positions and velocities for analysis and later rendering |
 
-## What changed in V1.4.1
+The prepared state retains the original 3,072 disk and 1,024 bulge coordinates and velocities, and adds distinct particles from the verified same parent realization. Stellar particle masses decrease fourfold; they are not cloned particles. All component masses are preserved. Sampling uses a recorded fixed seed. The runner subtracts a common overall center and bulk velocity, which preserves internal distances and relative velocities.
 
-- **Automatic Fourier diagnostics for isolated disk models:** annular `m=1...4` stellar Fourier amplitudes, finite-particle noise RMS, radial `m=2` phase, radial velocity dispersion, disk thickness, and an **approximate** axisymmetric Toomre `Q` calculated from the live softened gravitational potential.
-- **Analyze disk spirals** GUI tab: reanalyze saved isolated-disk trajectories without another N-body calculation. Exports two plots, `spiral_modes.csv`, `spiral_annuli.csv`, `spiral_report.json`.
-- **AGAMA availability panel** in the galaxy configuration: shows why the optional compiled extension cannot be imported in the GUI's active interpreter and where to install it. Does not attempt or claim automatic AGAMA installation or adapter validation.
-- **Regression tests** for Fourier modes, saved trajectories, and dependency status.
+This is one joint disk/bulge sampling comparison, not separate identification of their individual contributions or a seed ensemble. It can show whether the measured structural growth is sensitive to stellar sampling. A quieter result does not by itself prove an exact equilibrium distribution function.
 
-See `docs/SPIRAL_DIAGNOSTICS.md` for the mathematics and interpretation limits. The 3D viewer, cancellation, Mice preset and solver comparisons remain unchanged.
+No velocity damping, Q changes, force-kernel changes or new softening are introduced. Prograde versus retrograde orientation has no orbital meaning for this isolated test; encounter spin correction will be applied when constructing the animation's collision setup.
 
-**Try it in the GUI:** select **Isolated galaxy → Disk–bulge–halo → Native preview**, use at least ~800 stellar disk particles, run, and inspect the spiral diagnostics chart. Use **Analyze disk spirals** to revisit a saved result. Plummer models have no disk Fourier diagnostics.
+## What was checked before delivery
 
-**Standalone example:**
+- Parent candidate identity and unique matching of retained stars to the parent realization.
+- Exact halo-state retention before common recentering.
+- Component total masses and distinct added parent IDs.
+- Initial-state checksum, particle counts and finite coordinates/velocities.
+- Driver preflight and Python compilation. The long final run was not executed here.
+- The analysis helper was previously tested against the original isolation diagnostics and synthetic bending fields.
 
-```bash
-python -m experiments.spiral_study --particles 1500 --steps 360 --dt 0.003 --save-every 12
-# Or recompute the analysis from an already-saved isolated disk trajectory:
-python -m experiments.spiral_study --trajectory results/spiral_study/isolation_trajectory.npz
-```
+`prepare_final_stellar_control.py` and `final_stellar_initial.preparation.json` preserve the preparation procedure and source hashes for auditing. You do not need the large parent trajectory to run the supplied prepared NPZ.
 
-The included `results/v141_disk_demo/` is a reproducible **native preview demonstration**, not a validated equilibrium galaxy. Its finite particle noise and severe structural heating should be part of the interpretation.
-
-## Launching on Windows
-
-Extract the **entire** folder and double-click `start_gui.bat`. The launcher creates `.venv`, installs dependencies, and opens `http://127.0.0.1:7860`. Keep the console window open. Any Python startup traceback is saved to `startup_error.log`. The Windows batch file has the same corrected structure as V1.3; it has not been executed on Windows in this testing environment.
-
-For terminal use in the project directory:
-
-```bash
-pip install -r requirements.txt -r requirements-fast.txt -r requirements-gui.txt -r requirements-viewer.txt
-python -m pytest -q
-python -m experiments.isolation_study --model plummer --particles 500
-python -m experiments.isolation_study --model disk --backend preview --particles 1000
-python -m experiments.solver_study --particles-per-galaxy 200
-python -m experiments.mice_animation --disk 400 --bulge 50 --halo 200 --steps 160
-```
-
-AGAMA is a **separate optional compiled dependency**. The GUI can select it; there is no silent substitution with preview particles. See `docs/AGAMA_SETUP.md` for the API and installation cautions.
-
-## GUI modes
-
-1. **Isolated galaxy**: either Plummer (exact isotropic DF in the continuum limit) or disk–bulge–halo (native preview, AGAMA candidate, or a saved particle snapshot). Output includes structure-vs-time plots, initial profile checks for known galaxy configurations, numerical energy drift, and a *screening pass/fail* verdict. A screening pass is not scientific validation.
-2. **Mice encounter**: Barnes (2004)-inspired disk, bulge and cored halo parameters, approximate parabolic initial orbit (nominal pericenter 0.25 in G=1 units), disk orientations 25°/−30° and 40°/60°. Initial separation and sky viewing orientation are not an observationally fitted reconstruction. The initial halo/stellar configurations are live, but there is no gas.
-3. **Custom encounter**: initial relative position and velocity vectors, masses and orientations, with a saved trajectory and 3D playback.
-4. **Compare gravitational solvers**: *one-force-snapshot* acceleration errors and runtimes.
-5. **Full-trajectory solver study**: identical initial conditions evolved with compiled direct, compiled Barnes–Hut and NumPy direct (small N). Reports force errors, full evolution time, endpoint energy drift, galaxy-core tracks and final RMS per-particle position differences. The error metrics do not establish a converged merger by themselves.
-6. **Replay saved run**: choose an NPZ trajectory and change camera bounds, point count and halo visibility without recomputing forces.
-
-The 3D viewer supports Play/Pause, timeline scrubbing, individual-frame stepping and camera rotation. Cancellation is cooperative and is checked between full force evaluations; compilation and a single force evaluation cannot be interrupted instantly. Partial snapshots are retained when possible.
-
-The **Apply Barnes (2004) softening and timestep** button sets `epsilon = 0.0125` and `dt = 1/512`. It does **not** automatically make all other settings identical to the published experiment.
-
-## Reproducibility and results
-
-Each GUI run creates `results/runs/<name_timestamp>/` containing:
-
-- `initial_particles.npz`: exact initial state, including a reference for fair solver comparisons.
-- `run_trajectory.npz`: all saved particle positions, velocities, component IDs, progenitor IDs, and settings.
-- `config.json`: physical and numerical provenance, solver and generator labels.
-- `viewer_3d.html`: self-contained interactive 3D playback.
-- `isolation_metrics.csv`, `isolation_report.json`, `isolation_diagnostics.png` for isolated runs; plus `initial_profiles.png` / `.json` when the generator configuration is available.
-- `encounter_metrics.csv`, `encounter_report.json` for collision runs.
-- Optional MP4 and GIF exports.
-
-AGAMA-generated particle realizations are also cached to `results/galaxies/`; choose **Saved snapshot** to reuse one. Saved run folders are intentionally separate from the generated galaxy library. For newly generated AGAMA binary encounters, both progenitors are independent samples from one equilibrium model (seeds differ), without a second expensive model construction. Selecting a **single saved snapshot** as both progenitors still produces correlated finite-N noise, which is recorded in the run configuration. The native preview independently seeds two galaxies.
-
-The results are small enough for teaching experiments but can grow rapidly for high particle counts and many saved frames. Large runs should use the compiled force solvers.
-
-## Important scientific boundaries
-
-- The *native disk–bulge–halo* galaxy generator samples motivated **positions** but assigns approximate, not DF-equilibrium, velocities. It is for demos only.
-- The *Plummer* generator samples an analytic isotropic equilibrium DF, but finite-particle simulations with softened forces still need resolution and stability testing. Our short demonstration is only a screen.
-- The *AGAMA* adapter follows the official three-component self-consistent DF workflow, including component DFs, iterative potential updates, and DF particle sampling. **compiled AGAMA is not installed here; we have source-level and mocked-interface verification but real AGAMA model construction, masses, and isolated stability remain unverified**. We intentionally do not label those results validated.
-- The observed Mice (NGC 4676) contain gas and stellar populations absent from our collisionless model; a qualitative tidal picture cannot establish observational agreement. Actual orbital/pericenter measurements require tracking live galaxy centers, not only the nominal point-mass initialization.
-- The energy diagnostic is the total *softened* N-body energy sampled during the run (up to roughly a dozen stored frames for up to 6000 particles). Drift between sampled frames is not measured; for higher N, the expensive pairwise energy diagnostic is skipped.
-- **Do not treat the GUI's isolated screening thresholds (5% half-mass drift, 10% disk thickness drift, 1% endpoint energy) as universal scientific standards.** Longer isolation runs, several particle resolutions, multiple seeds, and comparisons against the published Mice are required.
-
-## Layout
-
-- `nbody/gravity/`: NumPy and Numba direct force, Python and Numba Barnes–Hut octree.
-- `nbody/galaxies/`: analytic profiles, seeded native samplers, AGAMA DF adapter.
-- `nbody/particles.py`, `integrate.py`, `encounters.py`: shared particle state, leapfrog integration, live encounters.
-- `nbody/diagnostics.py`: isolated structure, energy, analytic profile comparisons, and encounter summaries.
-- `nbody/solver_study.py`: end-to-end matched-initial-conditions force solver comparison.
-- `nbody/io.py`: saved particle snapshots and trajectories.
-- `nbody/viewer.py` / `animation.py`: interactive 3D and optional 2D video.
-- `experiments/`: reproducible standalone scripts; `app.py` is the Gradio GUI.
-- `docs/`: modeling choices, scientific status, usage, and cumulative bibliography.
-
-## Scientific references
-
-Barnes, J. E. (2004), *Shock-induced star formation in a model of the Mice*, MNRAS 350, 798, https://doi.org/10.1111/j.1365-2966.2004.07725.x ; Vasiliev, E. (2019), *AGAMA: Action-based galaxy modelling architecture*, https://doi.org/10.1093/mnras/sty2672 ; AGAMA official worked example, https://github.com/GalacticDynamics-Oxford/Agama/blob/master/py/example_self_consistent_model3.py . See `docs/BIBLIOGRAPHY.md` for the running inventory.
+After this comparison we move to animation development. Its measured limitations will be recorded rather than triggering an automatic sequence of more validation simulations.

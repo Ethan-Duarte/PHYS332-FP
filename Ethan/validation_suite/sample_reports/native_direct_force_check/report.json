@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "command": "forces",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "numba": "0.68.1",
+      "matplotlib": "3.10.8"
+    }
+  },
+  "inputs": [
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/upload/run_trajectory(9).npz",
+      "sha256": "48874f7c0bd98a2d2c62cb65fe5aa6a809adcd4861b7593b2258b899f0eda7d8"
+    },
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/validation_suite/sample_reports/native_direct_acceleration.npz",
+      "sha256": "ec14ef7548def49d68c06ab5a2e39c37c6ff8abe1ff299bf76a86b029b3b2ea6"
+    }
+  ],
+  "status": "MEASURED",
+  "checks": [
+    {
+      "name": "Acceleration input provenance",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "name": "median_relative_force_error",
+      "status": "MEASURED",
+      "value": 6.47069809232814e-17,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "p95_relative_force_error",
+      "status": "MEASURED",
+      "value": 3.002133148247106e-16,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "max_relative_force_error",
+      "status": "MEASURED",
+      "value": 5.221686845718437e-16,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    }
+  ],
+  "measurements": {
+    "median_relative_force_error": 6.47069809232814e-17,
+    "p95_relative_force_error": 3.002133148247106e-16,
+    "max_relative_force_error": 5.221686845718437e-16,
+    "sample_size": 123,
+    "relative_denominator_floor": 7.552915571701778e-12
+  },
+  "notes": [
+    "Independent vectorized direct Plummer reference; self-force explicitly excluded.",
+    "Errors measured at supplied target indices only. Include inner, outer and low-density targets; a random sample may miss difficult locations."
+  ],
+  "policy": {},
+  "claim": "No automatic certification of physical or observational validity. Passing applies only to named tests and declared tolerances."
+}

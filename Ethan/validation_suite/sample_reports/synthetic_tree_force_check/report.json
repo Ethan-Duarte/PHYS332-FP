@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "command": "forces",
+  "suite_source_sha256": {
+    "core.py": "4c604e7e2456c46be48d6afa68bc4a63d385f1f216774e0156932c48e90ead5c",
+    "export_forces.py": "3307958f3e88591a88a93fb1f45f14cbfd5e079d7c414e12c46a3575ea3f2c6d",
+    "run_control.py": "62bd56debfb50df6cdd5d3c13c01dd1b5c8312adbed6fbd3a12f23f352d0d1e1",
+    "solver_selftest.py": "e6b089ff9882e2730c5ee6f7cf3570c2148d7287eafa580e829952de20fe18c4",
+    "validate.py": "59f3085979b8cf9fa7173ca19de3de423e5e2f2467600267a5771e2c1f07531f"
+  },
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "numba": "0.68.1",
+      "matplotlib": "3.10.8"
+    }
+  },
+  "inputs": [
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/validation_suite/sample_reports/synthetic_adapter_input.npz",
+      "sha256": "da06f6c2d9067f55e5b797dc99a9fde6926f03e272eccb089d2017bf33beae88"
+    },
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/validation_suite/sample_reports/synthetic_tree_acceleration.npz",
+      "sha256": "ee5c0ada068593fbc2fde426db8edc5283102f8ea8f3b0bcf3acfa5d0258af37"
+    }
+  ],
+  "status": "MEASURED",
+  "checks": [
+    {
+      "name": "Acceleration input provenance",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "name": "median_relative_force_error",
+      "status": "MEASURED",
+      "value": 0.004361820019202996,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "p95_relative_force_error",
+      "status": "MEASURED",
+      "value": 0.010465545613533892,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "max_relative_force_error",
+      "status": "MEASURED",
+      "value": 0.013552461802284083,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    }
+  ],
+  "measurements": {
+    "median_relative_force_error": 0.004361820019202996,
+    "p95_relative_force_error": 0.010465545613533892,
+    "max_relative_force_error": 0.013552461802284083,
+    "sample_size": 24,
+    "relative_denominator_floor": 1.9761743417670938e-13
+  },
+  "notes": [
+    "Independent vectorized direct Plummer reference; self-force explicitly excluded.",
+    "Errors measured at supplied target indices only. Include inner, outer and low-density targets; a random sample may miss difficult locations."
+  ],
+  "policy": {},
+  "claim": "No automatic certification of physical or observational validity. Passing applies only to named tests and declared tolerances."
+}

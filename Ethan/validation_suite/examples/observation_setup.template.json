@@ -1,0 +1,14 @@
+{
+  "description": "FORMAT TEMPLATE ONLY. Scales, offsets and CSV entries must be replaced with registered observations. No measured data are supplied.",
+  "time": 0.53125,
+  "azimuth": 120,
+  "elevation": 0,
+  "roll": 0,
+  "length_unit": "kpc",
+  "velocity_unit": "km/s",
+  "length_scale": 1,
+  "velocity_scale": 1,
+  "systemic_velocity": 0,
+  "sky_offset": [0, 0],
+  "constraints_csv": "observation_regions.template.csv"
+}

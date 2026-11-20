@@ -1,0 +1,22 @@
+{
+  "reviewed": false,
+  "rationale": "Illustrative engineering screens only. Choose justified tolerances before comparing models; these are not literature validation thresholds.",
+  "limits": {
+    "max_sampled_energy_relative_change": 0.001,
+    "max_com_residual_over_initial_rms_radius": 0.0001,
+    "max_momentum_change_over_initial_scalar_internal_momentum": 0.0001,
+    "max_L_vector_change_over_initial_L_norm": 0.001,
+    "isolated_height": 0.05,
+    "isolated_sigma_z": 0.05,
+    "isolated_r50": 0.05,
+    "compare_height": 0.01,
+    "compare_r50": 0.01,
+    "compare_sigma_z": 0.01,
+    "compare_bulge_separation": 0.01,
+    "p95_relative_force_error": 0.01,
+    "max_relative_force_error": 0.05,
+    "initial_mass_relative_error": 0.01,
+    "initial_cdf_difference": 0.03,
+    "observation_velocity_sigma": 3.0
+  }
+}

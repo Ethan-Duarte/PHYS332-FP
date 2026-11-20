@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "command": "selftest",
+  "inputs": [
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/phys332-current/Ethan/nbody/gravity/parallel_direct.py",
+      "sha256": "8e6b9dca48dbcf2f0d9d67f63ef50f33674a1ab89bf7faa8b20956116462ef01"
+    },
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/phys332-current/Ethan/nbody/integrate.py",
+      "sha256": "1a25b3e710d85c198a5aafc78c7e015f958a50c55eaacf68c1c0d36e5d123981"
+    }
+  ],
+  "status": "PASS_FOR_SPECIFIED_CHECKS",
+  "checks": [
+    {
+      "name": "Direct force vs independent vectorized sum",
+      "status": "PASS",
+      "value": 4.600591911373043e-16,
+      "limit": 1e-10
+    },
+    {
+      "name": "Softened circular orbit: endpoint RMS / separation",
+      "status": "PASS",
+      "value": 0.0007476390367758474,
+      "limit": 0.01
+    },
+    {
+      "name": "Leapfrog second-order convergence on fixture",
+      "status": "PASS",
+      "value": 3.9973420871096206,
+      "expected": "3 < coarse/fine error < 5"
+    }
+  ],
+  "measurements": {
+    "force_max_relative_error": 4.600591911373043e-16,
+    "orbit_coarse_error": 0.002988568987670192,
+    "orbit_fine_error": 0.0007476390367758474,
+    "orbit_error_ratio": 3.9973420871096206,
+    "period": 4.451210743123604
+  },
+  "notes": [
+    "Acceptance bounds are declared for this numerical fixture, not galaxy or observational tolerances.",
+    "This tests the native project direct solver and leapfrog. It does not test Zeno or GADGET binaries.",
+    "Two orbital periods; independent DOP853 rtol=1e-12. Passing this fixture is not full galaxy validation."
+  ],
+  "policy": {},
+  "claim": "No automatic certification of physical or observational validity. Passing applies only to named tests and declared tolerances."
+}

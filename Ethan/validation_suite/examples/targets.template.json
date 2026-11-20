@@ -1,0 +1,8 @@
+{
+  "description": "Mass targets for one documented Mice-style model, not generic galaxy defaults. Add cdf_csv only when a target table for the actual model exists.",
+  "components": [
+    {"galaxy": 0, "component": 0, "mass": 0.1875, "coordinate": "disk_radius"},
+    {"galaxy": 0, "component": 1, "mass": 0.0625, "coordinate": "spherical_radius"},
+    {"galaxy": 0, "component": 2, "mass": 1.0, "coordinate": "spherical_radius"}
+  ]
+}

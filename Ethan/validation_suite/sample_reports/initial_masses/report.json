@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "command": "initial",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "numba": "0.68.1",
+      "matplotlib": "3.10.8"
+    }
+  },
+  "inputs": [
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/validation_native_direct_smoke/initial_particles.npz",
+      "sha256": "6e16bc12daeb2cb72e7a3570bccb584a7c834b0c8a456c873b47639dad7bfc8d"
+    },
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/validation_suite/examples/targets.template.json",
+      "sha256": "b51a964895cc051a4d7fc72d2f14bf4c2b468e81b1c19344d0f17701e13fcb98"
+    }
+  ],
+  "status": "INCOMPLETE",
+  "checks": [
+    {
+      "name": "g0 c0 target mass",
+      "status": "MEASURED",
+      "value": 0.0,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 c1 target mass",
+      "status": "MEASURED",
+      "value": 0.0,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 c2 target mass",
+      "status": "MEASURED",
+      "value": 4.768373145447313e-06,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "Full phase-space equilibrium",
+      "status": "MISSING",
+      "notes": "Spatial targets do not establish velocity support or stationarity; use velocity profiles and matched isolation controls"
+    }
+  ],
+  "measurements": {
+    "components": [
+      {
+        "galaxy": 0,
+        "component": 0,
+        "mass": 0.1875,
+        "count": 3072,
+        "mass_relative_error": 0.0
+      },
+      {
+        "galaxy": 0,
+        "component": 1,
+        "mass": 0.0625,
+        "count": 1024,
+        "mass_relative_error": 0.0
+      },
+      {
+        "galaxy": 0,
+        "component": 2,
+        "mass": 1.0000047683731454,
+        "count": 4096,
+        "mass_relative_error": 4.768373145447313e-06
+      }
+    ]
+  },
+  "notes": [
+    "CDF error is evaluated at supplied table radii, not an exact KS statistic; no p-value is inferred.",
+    "Profiles use each component COM. Use target tables that include the actual truncation/taper.",
+    "A profile inherited from a different galaxy construction must not be treated as the target for this one."
+  ],
+  "policy": {},
+  "claim": "No automatic certification of physical or observational validity. Passing applies only to named tests and declared tolerances."
+}

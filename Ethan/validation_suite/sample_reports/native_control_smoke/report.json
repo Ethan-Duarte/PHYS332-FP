@@ -1,0 +1,383 @@
+{
+  "schema_version": 1,
+  "command": "inspect",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "numba": "0.68.1",
+      "matplotlib": "3.10.8"
+    }
+  },
+  "inputs": [
+    {
+      "path": "/workspace/scratch/9fc85fb05d99/validation_native_direct_smoke/run_trajectory.npz",
+      "sha256": "2a7bc110ba41867fa9d6e3bd15fb1a9346f2bc59d3d3c400af07abcb88d0551d"
+    }
+  ],
+  "status": "MEASURED",
+  "checks": [
+    {
+      "name": "Array shapes, finite values, positive mass and increasing times",
+      "status": "PASS"
+    },
+    {
+      "name": "max_com_residual_over_initial_rms_radius",
+      "status": "MEASURED",
+      "value": 2.529790717500557e-16,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "max_momentum_change_over_initial_scalar_internal_momentum",
+      "status": "MEASURED",
+      "value": 1.4379520465109815e-16,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "max_L_vector_change_over_initial_L_norm",
+      "status": "MEASURED",
+      "value": 5.531946339487211e-15,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "max_L_vector_change_over_initial_scalar_L",
+      "status": "MEASURED",
+      "value": 3.769190433497327e-16,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "max_sampled_energy_relative_change",
+      "status": "MEASURED",
+      "value": 1.8904619634839422e-06,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 all_disk r50 evolution",
+      "status": "MEASURED",
+      "value": 0.0026371224429697173,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 all_disk r90 evolution",
+      "status": "MEASURED",
+      "value": 0.0007392043781750962,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 all_disk height evolution",
+      "status": "MEASURED",
+      "value": 0.003784734318499562,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 all_disk sigma_z evolution",
+      "status": "MEASURED",
+      "value": 0.0011163748486874925,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 all_disk sigma_R evolution",
+      "status": "MEASURED",
+      "value": 0.0024064199289542463,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 initial_R_le_2R50 r50 evolution",
+      "status": "MEASURED",
+      "value": 0.000183026367037144,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 initial_R_le_2R50 r90 evolution",
+      "status": "MEASURED",
+      "value": 0.003326475878229323,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 initial_R_le_2R50 height evolution",
+      "status": "MEASURED",
+      "value": 0.004380224386150845,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 initial_R_le_2R50 sigma_z evolution",
+      "status": "MEASURED",
+      "value": 0.000783055356514474,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    },
+    {
+      "name": "g0 initial_R_le_2R50 sigma_R evolution",
+      "status": "MEASURED",
+      "value": 0.0011509619637377771,
+      "limit": null,
+      "policy_reviewed": false,
+      "notes": ""
+    }
+  ],
+  "measurements": {
+    "conservation": {
+      "max_com_residual_over_initial_rms_radius": 2.529790717500557e-16,
+      "max_momentum_change_over_initial_scalar_internal_momentum": 1.4379520465109815e-16,
+      "max_L_vector_change_over_initial_L_norm": 5.531946339487211e-15,
+      "max_L_vector_change_over_initial_scalar_L": 3.769190433497327e-16,
+      "max_sampled_energy_relative_change": 1.8904619634839422e-06,
+      "energy_samples": 2,
+      "energy_force_law": {
+        "epsilon": 0.009375,
+        "G": 1.0,
+        "kernel": "plummer"
+      }
+    },
+    "structural_changes": [
+      {
+        "galaxy": 0,
+        "aperture": "all_disk",
+        "metric": "r50",
+        "endpoint_relative_change": -0.0026371224429697173,
+        "max_abs_relative_change": 0.0026371224429697173
+      },
+      {
+        "galaxy": 0,
+        "aperture": "all_disk",
+        "metric": "r90",
+        "endpoint_relative_change": 0.0007392043781750962,
+        "max_abs_relative_change": 0.0007392043781750962
+      },
+      {
+        "galaxy": 0,
+        "aperture": "all_disk",
+        "metric": "height",
+        "endpoint_relative_change": -0.003784734318499562,
+        "max_abs_relative_change": 0.003784734318499562
+      },
+      {
+        "galaxy": 0,
+        "aperture": "all_disk",
+        "metric": "sigma_z",
+        "endpoint_relative_change": 0.0011163748486874925,
+        "max_abs_relative_change": 0.0011163748486874925
+      },
+      {
+        "galaxy": 0,
+        "aperture": "all_disk",
+        "metric": "sigma_R",
+        "endpoint_relative_change": 0.0024064199289542463,
+        "max_abs_relative_change": 0.0024064199289542463
+      },
+      {
+        "galaxy": 0,
+        "aperture": "all_disk",
+        "metric": "A2",
+        "endpoint_relative_change": 0.18379617491902722,
+        "max_abs_relative_change": 0.18379617491902722
+      },
+      {
+        "galaxy": 0,
+        "aperture": "initial_R_le_2R50",
+        "metric": "r50",
+        "endpoint_relative_change": 0.000183026367037144,
+        "max_abs_relative_change": 0.000183026367037144
+      },
+      {
+        "galaxy": 0,
+        "aperture": "initial_R_le_2R50",
+        "metric": "r90",
+        "endpoint_relative_change": -0.003326475878229323,
+        "max_abs_relative_change": 0.003326475878229323
+      },
+      {
+        "galaxy": 0,
+        "aperture": "initial_R_le_2R50",
+        "metric": "height",
+        "endpoint_relative_change": -0.004380224386150845,
+        "max_abs_relative_change": 0.004380224386150845
+      },
+      {
+        "galaxy": 0,
+        "aperture": "initial_R_le_2R50",
+        "metric": "sigma_z",
+        "endpoint_relative_change": 0.000783055356514474,
+        "max_abs_relative_change": 0.000783055356514474
+      },
+      {
+        "galaxy": 0,
+        "aperture": "initial_R_le_2R50",
+        "metric": "sigma_R",
+        "endpoint_relative_change": 0.0011509619637377771,
+        "max_abs_relative_change": 0.0011509619637377771
+      },
+      {
+        "galaxy": 0,
+        "aperture": "initial_R_le_2R50",
+        "metric": "A2",
+        "endpoint_relative_change": -0.6285804770879612,
+        "max_abs_relative_change": 0.6285804770879612
+      }
+    ],
+    "metadata": {
+      "setup": "Mice geometry trial",
+      "backend": "native direct",
+      "source": {
+        "backend": "Zeno reference, experimental moment adjustment",
+        "epsilon": 0.009375,
+        "construction_force_model": {
+          "kernel": "plummer",
+          "epsilon": 0.009375,
+          "G": 1.0
+        },
+        "model_id": "zeno_reference_bdh_size_screen_v1",
+        "equilibrium_status": "unvalidated reduced-particle geometry screen",
+        "adjustment": {
+          "method": "vertical Jeans second moment in softened reference field",
+          "assumption": "zero R-z stress; separable initial vertical sampling",
+          "factor_min": 0.876929940375152,
+          "factor_max": 7.725493769674941,
+          "status": "experimental candidate; full DF and live stability unverified"
+        },
+        "source_sha256": "93d075ff06b54064badbc9ae1c8a87a4dab076fbaf8cfda6b77b6730d5895c53",
+        "frame": "unchanged model origin; no recentering",
+        "note": "Spheroid particles unchanged; not a reproduction of the original paper",
+        "parent_model_id": "zeno_reference_bdh_v1",
+        "size_screen": {
+          "scale": 1.25,
+          "seed": 1234,
+          "source_sha256": "ab94e9df11dd927b57e7b05c2b3f9c180bdede086b45fa1d56dc7603d1cdaf0f",
+          "source_model": {
+            "backend": "Zeno reference, experimental moment adjustment",
+            "epsilon": 0.0075,
+            "construction_force_model": {
+              "kernel": "plummer",
+              "epsilon": 0.0075,
+              "G": 1.0
+            },
+            "model_id": "zeno_reference_bdh_v1",
+            "equilibrium_status": "unvalidated",
+            "adjustment": {
+              "method": "vertical Jeans second moment in softened reference field",
+              "assumption": "zero R-z stress; separable initial vertical sampling",
+              "factor_min": 0.876929940375152,
+              "factor_max": 7.725493769674941,
+              "status": "experimental candidate; full DF and live stability unverified"
+            },
+            "source_sha256": "93d075ff06b54064badbc9ae1c8a87a4dab076fbaf8cfda6b77b6730d5895c53",
+            "frame": "unchanged model origin; no recentering",
+            "note": "Spheroid particles unchanged; not a reproduction of the original paper"
+          },
+          "counts": {
+            "0": 3072,
+            "1": 1024,
+            "2": 4096
+          },
+          "transformation": "All components: x -> s*x; v -> v/sqrt(s); epsilon -> s*epsilon; component masses unchanged.",
+          "internal_time_scale_factor": 1.3975424859373686,
+          "sampling": "Same selected particle IDs at every scale; reduced counts increase finite-particle noise.",
+          "interpretation": "Whole-galaxy size relative to fixed encounter orbit; changes halo and bulge as well as disk. Not a disk-only experiment or preserved-equilibrium certification."
+        }
+      },
+      "source_sha256": "a259ae858b7385a05eeaa2ffb83b5bdc55c95950180e502a0059695f3eeeafce",
+      "sampling": "Same particle realization rotated into both galaxies; not independent samples",
+      "eps": 0.009375,
+      "dt": 0.001953125,
+      "theta": null,
+      "usequad": true,
+      "duration": 0.015625,
+      "save_every": 8,
+      "nominal_separation": 1.0,
+      "nominal_pericenter": 0.2,
+      "orientations": [
+        [
+          25.0,
+          96.86989764584402
+        ],
+        [
+          40.0,
+          186.86989764584402
+        ]
+      ],
+      "reference_pericenter_angle_deg": 126.86989764584402,
+      "removed_disk_position": [
+        -0.0003585796347394357,
+        9.101494569586684e-05,
+        -6.414242972626474e-05
+      ],
+      "removed_disk_velocity": [
+        0.006917701260396301,
+        0.001118037906251192,
+        0.005692471453955881
+      ],
+      "caveat": "Moment-adjusted Identikit-style progenitors with Barnes-inspired orbit. Not an exact published fit or validated live equilibrium.",
+      "references": [
+        "https://arxiv.org/abs/astro-ph/0402248",
+        "https://arxiv.org/abs/0811.3039",
+        "https://github.com/joshuabarnes/zeno"
+      ],
+      "tree_command": [
+        "/home/whisky/nbody-tools/zeno-reference/bin/treecode_dp",
+        "in=/mnt/c/Users/Eef/MY SHIT/Documents/PHYS332-FP/Ethan/results/tail_search_16k_20261119_073901/orbit_s1p25_rp0p20/initial.snap",
+        "out=/mnt/c/Users/Eef/MY SHIT/Documents/PHYS332-FP/Ethan/results/tail_search_16k_20261119_073901/orbit_s1p25_rp0p20/encounter.snap",
+        "save=/mnt/c/Users/Eef/MY SHIT/Documents/PHYS332-FP/Ethan/results/tail_search_16k_20261119_073901/orbit_s1p25_rp0p20/state_%d",
+        "log=/mnt/c/Users/Eef/MY SHIT/Documents/PHYS332-FP/Ethan/results/tail_search_16k_20261119_073901/orbit_s1p25_rp0p20/tree.log",
+        "eps=0.009375",
+        "theta=0.7",
+        "usequad=true",
+        "dtime=0.001953125",
+        "tstop=1.25",
+        "dtout=0.015625",
+        "outputs=Mass,Position,Velocity"
+      ],
+      "solver_sha256": "eb06b2c7497dcd84b4319081f58fb50f9ff5117648c845a06e4a175eebebfdd2",
+      "G": 1.0,
+      "evolution_kernel": "plummer",
+      "validation_mode": "isolate",
+      "validation_parent_model_id": "ab94e9df11dd927b57e7b05c2b3f9c180bdede086b45fa1d56dc7603d1cdaf0f",
+      "input_precision": "replay initial frame promoted to float64",
+      "parent_trajectory_sha256": "48874f7c0bd98a2d2c62cb65fe5aa6a809adcd4861b7593b2258b899f0eda7d8",
+      "parent_solver_sha256": "7b4fbf5defc2eedef45f9069728476c3c40ba10cb7b92760e97282754d3e6b81",
+      "solver_identity_kind": "SHA256(force module bytes + integration module bytes); not compiled binary",
+      "force_source_path": "/workspace/scratch/9fc85fb05d99/phys332-current/Ethan/nbody/gravity/parallel_direct.py",
+      "integration_source_path": "/workspace/scratch/9fc85fb05d99/phys332-current/Ethan/nbody/integrate.py"
+    }
+  },
+  "notes": [
+    "Energy is calculated with direct pair sums at saved frames only; it does not bound all-step drift.",
+    "Energy, if requested, assumes fixed-mass self-gravity only; no external, cosmological or thermodynamic energy terms.",
+    "Fitted planes remove rigid tilt, not all warping. Radial cell residuals separate some coherent geometry but are not exact heating estimators.",
+    "Cell residuals cover only cells with >=10 particles; inspect cell_mass_coverage.",
+    "Initial_R_le_2R50 is a fixed set of initial particle IDs; annuli use instantaneous radii and fixed initial radial edges.",
+    "A1/A2 and rotation sign are coordinate conventions; mean_rotation_abs avoids arbitrary eigenvector signs.",
+    "Structural changes in encounters may be physical. No stability gate is applied to an encounter.",
+    "Component labels: 0=disk, 1=bulge, 2=halo. Float32 replay precision limits very small residuals."
+  ],
+  "policy": {},
+  "claim": "No automatic certification of physical or observational validity. Passing applies only to named tests and declared tolerances."
+}
